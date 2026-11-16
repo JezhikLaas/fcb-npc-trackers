@@ -1,0 +1,36 @@
+<div class="fcb-npc-trackers-panel__root">
+<header class="fcb-npc-trackers-panel__header">
+  <select name="filterNpc" aria-label="{{localize 'FCB_NPC_TRACKERS.Panel.filter'}}">
+    {{selectOptions npcChoices selected=filter valueAttr="value" labelAttr="label" blank=allLabel}}
+  </select>
+  <button type="button" data-action="addTracker">
+    <i class="fa-solid fa-plus" inert></i> {{localize "FCB_NPC_TRACKERS.Panel.new"}}
+  </button>
+</header>
+
+<div class="fcb-npc-trackers-panel__list">
+  {{#each cards}}
+    {{> "modules/fcb-npc-trackers/templates/tracker-card.hbs" this}}
+  {{else}}
+    <p class="hint fcb-npc-trackers-panel__empty">{{localize "FCB_NPC_TRACKERS.Panel.empty"}}</p>
+  {{/each}}
+
+  {{#if aside.length}}
+    <details class="fcb-npc-trackers-panel__aside" {{#if asideOpen}}open{{/if}}>
+      <summary>{{localize "FCB_NPC_TRACKERS.Panel.aside" count=aside.length}}</summary>
+      {{#each aside}}
+        {{> "modules/fcb-npc-trackers/templates/tracker-card.hbs" this}}
+      {{/each}}
+    </details>
+  {{/if}}
+</div>
+
+{{#if undo}}
+  <footer class="fcb-npc-trackers-panel__undo">
+    <span>{{localize "FCB_NPC_TRACKERS.Panel.removed" name=undo.name}}</span>
+    <button type="button" data-action="undoRemove" data-tracker-id="{{undo.trackerId}}">
+      <i class="fa-solid fa-rotate-left" inert></i> {{localize "FCB_NPC_TRACKERS.Panel.undo"}}
+    </button>
+  </footer>
+{{/if}}
+</div>

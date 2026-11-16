@@ -1,0 +1,49 @@
+{
+  "id": "fcb-npc-trackers",
+  "title": "Campaign Builder: NPC Trackers",
+  "description": "Quick, freely definable relationship trackers (e.g. sympathy and antipathy with any number of steps) between NPCs and player characters for the World & Campaign Builder.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14.370",
+    "maximum": "14"
+  },
+  "authors": [
+    {
+      "name": "Jözhik"
+    }
+  ],
+  "license": "LICENSE",
+  "relationships": {
+    "requires": [
+      {
+        "id": "campaign-builder",
+        "type": "module",
+        "compatibility": {
+          "minimum": "1.10.1"
+        }
+      }
+    ]
+  },
+  "esmodules": [
+    "scripts/main.mjs"
+  ],
+  "styles": [
+    "styles/npc-trackers.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "de",
+      "name": "Deutsch",
+      "path": "lang/de.json"
+    }
+  ],
+  "url": "",
+  "manifest": "",
+  "download": ""
+}

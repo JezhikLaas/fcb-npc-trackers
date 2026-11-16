@@ -1,0 +1,96 @@
+<div class="fcb-npc-trackers-form__root">
+<section class="fcb-npc-trackers-form__body">
+  {{#if noEntries}}
+    <p class="notification warning">{{localize "FCB_NPC_TRACKERS.Form.noEntries"}}</p>
+    <button type="button" data-action="refresh">
+      <i class="fa-solid fa-rotate" inert></i> {{localize "FCB_NPC_TRACKERS.Form.refresh"}}
+    </button>
+  {{/if}}
+
+  <div class="form-group">
+    <label for="fcb-npc-trackers-npc">{{localize "FCB_NPC_TRACKERS.Form.npc"}}</label>
+    <div class="form-fields">
+      {{#if isEdit}}
+        <span>{{npcName}}</span>
+      {{else}}
+        <input type="search" data-filter="npcUuid" placeholder="{{localize 'FCB_NPC_TRACKERS.Form.search'}}"
+               aria-label="{{localize 'FCB_NPC_TRACKERS.Form.search'}}">
+        <select id="fcb-npc-trackers-npc" name="npcUuid" required>
+          {{selectOptions npcChoices selected=npcUuid valueAttr="value" labelAttr="label" blank=noneLabel}}
+        </select>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="fcb-npc-trackers-pc">{{localize "FCB_NPC_TRACKERS.Form.pc"}}</label>
+    <div class="form-fields">
+      <input type="search" data-filter="pcUuid" placeholder="{{localize 'FCB_NPC_TRACKERS.Form.search'}}"
+             aria-label="{{localize 'FCB_NPC_TRACKERS.Form.search'}}">
+      <select id="fcb-npc-trackers-pc" name="pcUuid">
+        {{selectOptions pcChoices selected=pcUuid valueAttr="value" labelAttr="label" blank=noPcLabel}}
+      </select>
+    </div>
+  </div>
+
+  {{#unless isEdit}}
+    <div class="form-group">
+      <label for="fcb-npc-trackers-template">{{localize "FCB_NPC_TRACKERS.Form.template"}}</label>
+      <div class="form-fields">
+        <select id="fcb-npc-trackers-template" name="templateId">
+          {{selectOptions templateChoices selected=templateId valueAttr="value" labelAttr="label"}}
+        </select>
+      </div>
+    </div>
+  {{/unless}}
+
+  <div class="form-group">
+    <label for="fcb-npc-trackers-name">{{localize "FCB_NPC_TRACKERS.Form.name"}}</label>
+    <div class="form-fields">
+      <input id="fcb-npc-trackers-name" type="text" name="name" value="{{name}}" maxlength="80"
+             placeholder="{{localize 'FCB_NPC_TRACKERS.Form.namePlaceholder'}}">
+    </div>
+  </div>
+
+  <table class="fcb-npc-trackers-form__bars">
+    <thead>
+      <tr>
+        <th>{{localize "FCB_NPC_TRACKERS.Form.label"}}</th>
+        <th>{{localize "FCB_NPC_TRACKERS.Form.steps"}}</th>
+        <th>{{localize "FCB_NPC_TRACKERS.Form.color"}}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each bars}}
+        <tr>
+          <td>
+            <input type="hidden" name="bars.{{index}}.id" value="{{id}}">
+            <input type="text" name="bars.{{index}}.label" value="{{label}}" maxlength="40" required>
+          </td>
+          <td><input type="number" name="bars.{{index}}.steps" value="{{steps}}" min="1" max="{{@root.maxSteps}}" step="1" required></td>
+          <td><input type="color" name="bars.{{index}}.color" value="{{color}}"></td>
+          <td>
+            <button type="button" class="icon fa-solid fa-trash" data-action="removeBar" data-index="{{index}}"
+                    data-tooltip="FCB_NPC_TRACKERS.Form.removeBar" aria-label="{{localize 'FCB_NPC_TRACKERS.Form.removeBar'}}"
+                    {{disabled @root.cannotRemove}}></button>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <button type="button" data-action="addBar" {{disabled cannotAdd}}>
+    <i class="fa-solid fa-plus" inert></i> {{localize "FCB_NPC_TRACKERS.Form.addBar" max=maxBars}}
+  </button>
+</section>
+
+<footer class="form-footer">
+  <button type="button" data-action="cancel">
+    <i class="fa-solid fa-xmark" inert></i> {{localize "FCB_NPC_TRACKERS.Form.cancel"}}
+  </button>
+  <button type="submit" {{disabled blocked}}>
+    <i class="fa-solid fa-floppy-disk" inert></i> {{localize "FCB_NPC_TRACKERS.Form.save"}}
+  </button>
+</footer>
+</div>

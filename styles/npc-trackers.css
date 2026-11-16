@@ -1,0 +1,282 @@
+/* Campaign Builder: NPC Trackers – styles.
+ * All classes are prefixed fcb-npc-trackers. Colors come from Foundry's CSS variables where possible. */
+
+.fcb-npc-trackers {
+  --fcb-npc-trackers-box-width: 34px;
+  --fcb-npc-trackers-box-height: 20px;
+  --fcb-npc-trackers-border: var(--color-border-dark-4, #555);
+  --fcb-npc-trackers-muted: var(--color-text-subtle, #888);
+}
+
+/* ---------- Panel ---------- */
+
+.fcb-npc-trackers-panel .window-content {
+  padding: 8px;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.fcb-npc-trackers-panel__root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+}
+
+.fcb-npc-trackers-panel__header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.fcb-npc-trackers-panel__header select {
+  flex: 1;
+}
+
+.fcb-npc-trackers-panel__header button {
+  flex: 0 0 auto;
+  width: auto;
+  white-space: nowrap;
+}
+
+.fcb-npc-trackers-panel__list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 2px;
+}
+
+.fcb-npc-trackers-panel__empty {
+  text-align: center;
+  margin: 24px 0;
+}
+
+.fcb-npc-trackers-panel__aside > summary {
+  cursor: pointer;
+  color: var(--fcb-npc-trackers-muted);
+  margin: 4px 0 8px;
+}
+
+.fcb-npc-trackers-panel__aside > .fcb-npc-trackers-card + .fcb-npc-trackers-card {
+  margin-top: 8px;
+}
+
+.fcb-npc-trackers-panel__undo {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border: 1px solid var(--fcb-npc-trackers-border);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.fcb-npc-trackers-panel__undo button {
+  width: auto;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* ---------- Card ---------- */
+
+.fcb-npc-trackers-card {
+  border: 1px solid var(--fcb-npc-trackers-border);
+  border-radius: 6px;
+  padding: 6px 8px 8px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.fcb-npc-trackers-card.is-aside {
+  opacity: 0.75;
+}
+
+.fcb-npc-trackers-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.fcb-npc-trackers-card__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-weight: bold;
+  min-width: 0;
+}
+
+.fcb-npc-trackers-card__subtitle {
+  font-weight: normal;
+  color: var(--fcb-npc-trackers-muted);
+}
+
+.fcb-npc-trackers-card .is-missing {
+  color: var(--color-level-error, #c0504d);
+  font-style: italic;
+}
+
+.fcb-npc-trackers-card__actions {
+  display: flex;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+
+.fcb-npc-trackers-card__actions button,
+.fcb-npc-trackers-bar__controls button {
+  width: 24px;
+  height: 24px;
+  min-height: 0;
+  padding: 0;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+.fcb-npc-trackers-card__body {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.fcb-npc-trackers-card__bars {
+  display: flex;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+/* ---------- Bars ---------- */
+
+.fcb-npc-trackers-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.fcb-npc-trackers-bar__label {
+  max-width: calc(var(--fcb-npc-trackers-box-width) + 24px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-size-12, 12px);
+  color: var(--fcb-npc-trackers-muted);
+}
+
+.fcb-npc-trackers-bar__boxes {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.fcb-npc-trackers-box {
+  width: var(--fcb-npc-trackers-box-width);
+  height: var(--fcb-npc-trackers-box-height);
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--fcb-npc-trackers-border);
+  border-radius: 3px;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.fcb-npc-trackers-box:hover {
+  border-color: var(--fcb-npc-trackers-color);
+  box-shadow: 0 0 4px var(--fcb-npc-trackers-color);
+}
+
+.fcb-npc-trackers-box.is-filled {
+  background: var(--fcb-npc-trackers-color);
+  border-color: var(--fcb-npc-trackers-color);
+}
+
+.fcb-npc-trackers-bar__controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fcb-npc-trackers-bar__value {
+  min-width: 2.4em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--font-size-12, 12px);
+}
+
+/* ---------- Log ---------- */
+
+.fcb-npc-trackers-card__log {
+  flex: 1;
+  min-width: 0;
+  max-height: 190px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0 4px 0 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fcb-npc-trackers-log-entry {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 8px;
+  row-gap: 2px;
+  align-items: baseline;
+  font-size: var(--font-size-12, 12px);
+}
+
+.fcb-npc-trackers-log-entry__time {
+  color: var(--fcb-npc-trackers-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.fcb-npc-trackers-log-entry__change {
+  font-weight: bold;
+}
+
+.fcb-npc-trackers-log-entry__change i {
+  color: var(--fcb-npc-trackers-color);
+}
+
+.fcb-npc-trackers-log-entry__note {
+  grid-column: 1 / -1;
+  height: 22px;
+  font-size: var(--font-size-12, 12px);
+}
+
+/* ---------- Form ---------- */
+
+.fcb-npc-trackers-form .form-fields input[type="search"] {
+  flex: 0 0 9em;
+}
+
+.fcb-npc-trackers-form__bars {
+  width: 100%;
+  margin: 8px 0;
+}
+
+.fcb-npc-trackers-form__bars th {
+  text-align: left;
+  font-weight: normal;
+  color: var(--fcb-npc-trackers-muted);
+}
+
+.fcb-npc-trackers-form__bars input[type="number"] {
+  width: 4.5em;
+}
+
+.fcb-npc-trackers-form__bars input[type="color"] {
+  width: 3em;
+  padding: 0 2px;
+}

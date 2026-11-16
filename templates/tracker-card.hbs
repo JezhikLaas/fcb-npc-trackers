@@ -1,0 +1,65 @@
+<article class="fcb-npc-trackers-card{{#unless active}} is-aside{{/unless}}" data-tracker-id="{{id}}">
+  <header class="fcb-npc-trackers-card__header">
+    <div class="fcb-npc-trackers-card__title">
+      <span class="fcb-npc-trackers-card__npc{{#if npcMissing}} is-missing{{/if}}">{{npcName}}</span>
+      {{#if hasPc}}
+        <i class="fa-solid fa-arrows-left-right" inert></i>
+        <span class="fcb-npc-trackers-card__pc{{#if pcMissing}} is-missing{{/if}}"
+              {{#if playerName}}data-tooltip="{{playerName}}"{{/if}}>{{pcName}}</span>
+      {{/if}}
+      {{#if subtitle}}<span class="fcb-npc-trackers-card__subtitle">{{subtitle}}</span>{{/if}}
+    </div>
+    <div class="fcb-npc-trackers-card__actions">
+      <button type="button" class="icon fa-solid fa-pen" data-action="editTracker" data-tracker-id="{{id}}"
+              data-tooltip="FCB_NPC_TRACKERS.Card.edit" aria-label="{{localize 'FCB_NPC_TRACKERS.Card.edit'}}"></button>
+      {{#if active}}
+        <button type="button" class="icon fa-solid fa-box-archive" data-action="toggleActive" data-tracker-id="{{id}}" data-active="false"
+                data-tooltip="FCB_NPC_TRACKERS.Card.setAside" aria-label="{{localize 'FCB_NPC_TRACKERS.Card.setAside'}}"></button>
+      {{else}}
+        <button type="button" class="icon fa-solid fa-box-open" data-action="toggleActive" data-tracker-id="{{id}}" data-active="true"
+                data-tooltip="FCB_NPC_TRACKERS.Card.activate" aria-label="{{localize 'FCB_NPC_TRACKERS.Card.activate'}}"></button>
+      {{/if}}
+      <button type="button" class="icon fa-solid fa-trash" data-action="removeTracker" data-tracker-id="{{id}}"
+              data-tooltip="FCB_NPC_TRACKERS.Card.remove" aria-label="{{localize 'FCB_NPC_TRACKERS.Card.remove'}}"></button>
+    </div>
+  </header>
+
+  <div class="fcb-npc-trackers-card__body">
+    <div class="fcb-npc-trackers-card__bars">
+      {{#each bars}}
+        <div class="fcb-npc-trackers-bar" style="--fcb-npc-trackers-color: {{color}}">
+          <div class="fcb-npc-trackers-bar__label" title="{{label}}">{{label}}</div>
+          <div class="fcb-npc-trackers-bar__boxes">
+            {{#each boxes}}
+              <button type="button" class="fcb-npc-trackers-box{{#if filled}} is-filled{{/if}}"
+                      data-action="clickBox" data-tracker-id="{{trackerId}}" data-bar-id="{{barId}}" data-index="{{index}}"
+                      aria-label="{{ariaLabel}}" aria-pressed="{{filled}}"></button>
+            {{/each}}
+          </div>
+          <div class="fcb-npc-trackers-bar__controls">
+            <button type="button" class="icon fa-solid fa-minus" data-action="stepBar" data-tracker-id="{{trackerId}}" data-bar-id="{{id}}" data-delta="-1"
+                    aria-label="{{localize 'FCB_NPC_TRACKERS.Card.decrease'}}" {{disabled (not canDecrease)}}></button>
+            <span class="fcb-npc-trackers-bar__value">{{value}}/{{steps}}</span>
+            <button type="button" class="icon fa-solid fa-plus" data-action="stepBar" data-tracker-id="{{trackerId}}" data-bar-id="{{id}}" data-delta="1"
+                    aria-label="{{localize 'FCB_NPC_TRACKERS.Card.increase'}}" {{disabled (not canIncrease)}}></button>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+
+    <ol class="fcb-npc-trackers-card__log">
+      {{#each log}}
+        <li class="fcb-npc-trackers-log-entry" style="--fcb-npc-trackers-color: {{color}}">
+          <span class="fcb-npc-trackers-log-entry__time">{{time}}</span>
+          <span class="fcb-npc-trackers-log-entry__change">
+            <i class="fa-solid {{icon}}" inert></i> {{label}} {{from}} → {{to}}
+          </span>
+          <input type="text" class="fcb-npc-trackers-log-entry__note" data-note data-tracker-id="{{trackerId}}" data-log-id="{{id}}"
+                 value="{{note}}" maxlength="500" placeholder="{{localize 'FCB_NPC_TRACKERS.Card.notePlaceholder'}}">
+        </li>
+      {{else}}
+        <li class="hint">{{localize "FCB_NPC_TRACKERS.Card.noChanges"}}</li>
+      {{/each}}
+    </ol>
+  </div>
+</article>

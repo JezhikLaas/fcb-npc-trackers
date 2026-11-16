@@ -1,0 +1,70 @@
+{
+  "FCB_NPC_TRACKERS": {
+    "Templates": {
+      "sympathyAntipathy": {
+        "name": "Sympathy / Antipathy",
+        "sympathy": "Sympathy",
+        "antipathy": "Antipathy"
+      },
+      "singleBar": {
+        "name": "Single bar",
+        "bar": "Value"
+      }
+    },
+    "Errors": {
+      "gmOnly": "Only the GM can change trackers."
+    },
+    "Keybindings": {
+      "openPanel": "Open or close the tracker panel"
+    },
+    "SceneControl": {
+      "title": "NPC trackers"
+    },
+    "Panel": {
+      "title": "NPC Trackers",
+      "new": "New tracker",
+      "filter": "Filter by NPC",
+      "filterAll": "All NPCs",
+      "empty": "No active trackers. Create one with “New tracker”.",
+      "aside": "Set aside ({count})",
+      "removed": "Tracker removed: {name}",
+      "undo": "Undo",
+      "missingNpc": "NPC no longer exists",
+      "missingPc": "PC no longer exists"
+    },
+    "Card": {
+      "edit": "Edit tracker",
+      "setAside": "Set aside",
+      "activate": "Show in panel",
+      "remove": "Remove tracker",
+      "increase": "One step up",
+      "decrease": "One step down",
+      "boxLabel": "{label}: step {index} of {steps}",
+      "notePlaceholder": "Add note…",
+      "noChanges": "No changes yet."
+    },
+    "Form": {
+      "titleCreate": "New tracker",
+      "titleEdit": "Edit tracker",
+      "npc": "NPC",
+      "pc": "Player character",
+      "noPc": "— none —",
+      "search": "Search…",
+      "template": "Template",
+      "name": "Name",
+      "namePlaceholder": "Optional, e.g. Mood at the feast",
+      "label": "Bar",
+      "steps": "Steps",
+      "color": "Color",
+      "addBar": "Add bar (max. {max})",
+      "removeBar": "Remove bar",
+      "newBar": "New bar",
+      "save": "Save",
+      "cancel": "Cancel",
+      "noEntries": "No NPCs found in the Campaign Builder's compendiums (“FCB - …”). Create NPCs in the Campaign Builder first, then press “Refresh list”.",
+      "needNpc": "Please choose an NPC.",
+      "needBarLabel": "Every bar needs a name.",
+      "refresh": "Refresh list"
+    }
+  }
+}
