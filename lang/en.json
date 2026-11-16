@@ -61,10 +61,13 @@
       "newBar": "New bar",
       "save": "Save",
       "cancel": "Cancel",
-      "noEntries": "No NPCs found in the Campaign Builder's compendiums (“FCB - …”). Create NPCs in the Campaign Builder first, then press “Refresh list”.",
-      "needNpc": "Please choose an NPC.",
+      "noEntries": "No NPCs found in the Campaign Builder's compendiums (“FCB - …”). You can still type an own name, or press “Refresh list” after creating NPCs.",
+      "needNpc": "Please choose an NPC or enter a name.",
       "needBarLabel": "Every bar needs a name.",
-      "refresh": "Refresh list"
+      "refresh": "Refresh list",
+      "customName": "— own name —",
+      "npcNamePlaceholder": "Own name, e.g. Gulfport Authorities",
+      "pcNamePlaceholder": "Own name, e.g. Party"
     }
   }
 }

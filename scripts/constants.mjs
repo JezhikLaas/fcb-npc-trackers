@@ -33,7 +33,9 @@ export const LIMITS = Object.freeze({
   /** Maximum number of steps per bar. */
   MAX_STEPS: 12,
   /** Maximum number of log entries kept per tracker (oldest are dropped first). */
-  MAX_LOG: 200
+  MAX_LOG: 200,
+  /** Maximum length of a manual NPC/PC name. */
+  MAX_NAME: 80
 });
 
 /** Keys of this module's settings. */

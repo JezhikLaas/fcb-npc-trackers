@@ -23,8 +23,10 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 /**
  * @typedef {object} Draft
  * @property {string} name
- * @property {string} npcUuid
- * @property {string} pcUuid
+ * @property {string} npcUuid   CB entry, or "" for a manual NPC.
+ * @property {string} npcName   Manual name, used while `npcUuid` is empty.
+ * @property {string} pcUuid    CB entry, or "" for none/manual.
+ * @property {string} pcName    Manual name, used while `pcUuid` is empty.
  * @property {string} templateId
  * @property {DraftBar[]} bars
  */
@@ -48,7 +50,7 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
   /**
    * @param {object} [data]
    * @param {string|null} [data.trackerId]  Edit this tracker instead of creating one.
-   * @param {string} [data.npcUuid]         Preselected NPC (create only).
+   * @param {string} [data.npcUuid]         Preselected NPC (create only): a CB uuid or a `name:<text>` filter key.
    * @param {object} [options]              ApplicationV2 options.
    */
   constructor({ trackerId = null, npcUuid } = {}, options = {}) {
@@ -122,11 +124,14 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
       this.#restored = true;
     }
     const empty = !isEdit && npcChoices.length === 0;
-    const npcName = isEdit ? ((await CampaignBuilderBridge.resolve(d.npcUuid))?.name ?? "") : "";
+    const npcLabel = isEdit && d.npcUuid ? ((await CampaignBuilderBridge.resolve(d.npcUuid))?.name ?? "") : "";
 
     return Object.assign(context, {
       isEdit,
-      npcName,
+      npcLabel,
+      npcFixed: isEdit && Boolean(d.npcUuid),
+      npcName: d.npcName,
+      pcName: d.pcName,
       npcChoices,
       pcChoices,
       templateChoices: TrackerStore.templates.map(t => ({ value: t.id, label: game.i18n.localize(t.name) })),
@@ -134,15 +139,15 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
       pcUuid: d.pcUuid,
       templateId: d.templateId,
       name: d.name,
-      noneLabel: "—",
+      customNpcLabel: game.i18n.localize(`${I18N_PREFIX}.Form.customName`),
       noPcLabel: game.i18n.localize(`${I18N_PREFIX}.Form.noPc`),
       bars: d.bars.map((bar, index) => ({ ...bar, index })),
       maxSteps: LIMITS.MAX_STEPS,
+      maxName: LIMITS.MAX_NAME,
       maxBars: LIMITS.MAX_BARS,
       cannotAdd: d.bars.length >= LIMITS.MAX_BARS,
       cannotRemove: d.bars.length <= 1,
-      noEntries: empty,
-      blocked: empty
+      noEntries: empty
     });
   }
 
@@ -167,8 +172,8 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
   #restoreLast(npcChoices, pcChoices) {
     const last = ModuleSettings.lastCreate;
     const d = this.#draft;
-    if (!d.npcUuid && npcChoices.some(c => c.value === last.npcUuid)) d.npcUuid = last.npcUuid;
-    if (!d.pcUuid && pcChoices.some(c => c.value === last.pcUuid)) d.pcUuid = last.pcUuid;
+    if (!d.npcUuid && !d.npcName && npcChoices.some(c => c.value === last.npcUuid)) d.npcUuid = last.npcUuid;
+    if (!d.pcUuid && !d.pcName && pcChoices.some(c => c.value === last.pcUuid)) d.pcUuid = last.pcUuid;
   }
 
   /** @override */
@@ -204,13 +209,17 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
     const data = foundry.utils.expandObject(formData.object);
     const draft = this.#draft;
     const previousTemplate = draft.templateId;
+    const previousIdentity = `${draft.npcUuid}|${draft.pcUuid}`;
 
     draft.name = data.name ?? "";
     draft.pcUuid = data.pcUuid ?? "";
+    // Name inputs are disabled (and absent from the form data) while a CB entry is selected.
+    if (data.pcName !== undefined) draft.pcName = data.pcName;
     if (!this.#trackerId) {
       draft.npcUuid = data.npcUuid ?? "";
       draft.templateId = data.templateId ?? draft.templateId;
     }
+    if (data.npcName !== undefined) draft.npcName = data.npcName;
     draft.bars = Object.entries(data.bars ?? {})
       .sort(([a], [b]) => Number(a) - Number(b))
       .map(([, bar]) => ({
@@ -220,8 +229,10 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
         color: TrackerMath.isColor(bar.color) ? bar.color : DEFAULT_BAR_COLOR
       }));
 
-    if (!this.#trackerId && draft.templateId !== previousTemplate) {
-      draft.bars = TrackerForm.#barsFromTemplateId(draft.templateId);
+    const templateChanged = !this.#trackerId && draft.templateId !== previousTemplate;
+    if (templateChanged) draft.bars = TrackerForm.#barsFromTemplateId(draft.templateId);
+    // Switching a selection between "CB entry" and "own name" enables/disables the name input.
+    if (templateChanged || previousIdentity !== `${draft.npcUuid}|${draft.pcUuid}`) {
       await this.render();
       return;
     }
@@ -272,14 +283,28 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
     const d = this.#draft;
     const warn = key => ui.notifications.warn(`${I18N_PREFIX}.Form.${key}`, { localize: true });
     const bars = d.bars.map(bar => ({ ...bar, label: bar.label.trim() }));
-    if (!this.#trackerId && !d.npcUuid) return warn("needNpc");
+    const npcName = d.npcName.trim();
+    if (!d.npcUuid && !npcName) return warn("needNpc");
     if (!bars.length || bars.some(bar => !bar.label)) return warn("needBarLabel");
 
     try {
       if (this.#trackerId) {
-        await TrackerStore.updateTracker(this.#trackerId, { name: d.name, pcUuid: d.pcUuid || null, bars });
+        await TrackerStore.updateTracker(this.#trackerId, {
+          name: d.name,
+          npcName,
+          pcUuid: d.pcUuid || null,
+          pcName: d.pcName,
+          bars
+        });
       } else {
-        await TrackerStore.create({ npcUuid: d.npcUuid, pcUuid: d.pcUuid || null, name: d.name, bars });
+        await TrackerStore.create({
+          npcUuid: d.npcUuid,
+          npcName,
+          pcUuid: d.pcUuid || null,
+          pcName: d.pcName,
+          name: d.name,
+          bars
+        });
         await ModuleSettings.setLastCreate({ npcUuid: d.npcUuid, pcUuid: d.pcUuid, templateId: d.templateId });
       }
     } catch (err) {
@@ -296,12 +321,16 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
    * @returns {Draft}
    */
   static #draftForCreate(npcUuid) {
+    const prefix = TrackerMath.NAME_KEY_PREFIX;
+    const manual = npcUuid?.startsWith(prefix) ? npcUuid.slice(prefix.length) : "";
     const last = ModuleSettings.lastCreate;
     const templateId = TrackerTemplates.find(TrackerStore.templates, last.templateId) ? last.templateId : DEFAULT_TEMPLATE_ID;
     return {
       name: "",
-      npcUuid: npcUuid || "",
+      npcUuid: manual ? "" : npcUuid || "",
+      npcName: manual,
       pcUuid: "",
+      pcName: "",
       templateId,
       bars: TrackerForm.#barsFromTemplateId(templateId)
     };
@@ -317,7 +346,9 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
     return {
       name: game.i18n.localize(tracker.name),
       npcUuid: tracker.npcUuid,
+      npcName: tracker.npcName ?? "",
       pcUuid: tracker.pcUuid ?? "",
+      pcName: tracker.pcName ?? "",
       templateId: "",
       bars: tracker.bars.map(bar => ({
         id: bar.id,

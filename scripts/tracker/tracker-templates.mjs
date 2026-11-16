@@ -55,19 +55,23 @@ export class TrackerTemplates {
    * Build the source data of a new tracker from a template.
    * @param {TrackerTemplate} template
    * @param {object} options
-   * @param {string} options.npcUuid  UUID of the NPC page.
+   * @param {string} [options.npcUuid]  UUID of the NPC page; empty for a manual NPC.
+   * @param {string} [options.npcName]  Manual NPC name (used while `npcUuid` is empty).
    * @param {string|null} [options.pcUuid]  UUID of the PC page, or null.
+   * @param {string} [options.pcName]  Manual PC name (used while `pcUuid` is empty).
    * @param {string} [options.name]  Tracker name, defaults to the template name.
    * @param {() => string} options.idFactory  Produces unique ids (Foundry: `foundry.utils.randomID`).
    * @param {number} [options.now]  Creation timestamp in ms.
    * @returns {import("./tracker-math.mjs").Tracker}
    */
-  static build(template, { npcUuid, pcUuid = null, name, idFactory, now = Date.now() }) {
+  static build(template, { npcUuid = "", npcName = "", pcUuid = null, pcName = "", name, idFactory, now = Date.now() }) {
     return TrackerMath.normalize({
       id: idFactory(),
       name: name ?? template.name,
       npcUuid,
+      npcName,
       pcUuid,
+      pcName,
       active: true,
       bars: template.bars.slice(0, LIMITS.MAX_BARS).map(bar => ({
         id: idFactory(),

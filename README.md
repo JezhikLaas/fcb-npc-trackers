@@ -12,6 +12,20 @@ and an optional note records why.
 > been tried in a real Foundry world yet. Requires Foundry VTT v14 and
 > World & Campaign Builder 1.10.1 or newer.
 
+## Installation
+
+In Foundry's setup screen: **Add-on Modules → Install Module**, paste the manifest URL
+of the latest release into the field at the bottom and click **Install**:
+
+```
+https://github.com/JezhikLaas/fcb-npc-trackers/releases/latest/download/module.json
+```
+
+Then enable **Daggerheart: Campaign Currency** in your world.
+
+## AI Info
+This module has been developed with the help of Claude Code.
+
 ## Using it
 
 Open the **tracker panel** with `Shift+Alt+N` (rebindable in the controls settings) or with the
@@ -42,10 +56,14 @@ const [pc] = cb.getEntries(cb.TOPICS.PC);
 const tracker = await api.createTracker({ npcUuid: npc.uuid, pcUuid: pc.uuid });
 await api.setValue(tracker.id, tracker.bars[0].id, 3, "Complimented her dress");
 api.openPanel({ npcUuid: npc.uuid });
+
+// NPC and PC need not exist in the Campaign Builder: free-text names work as well
+await api.createTracker({ npcName: "Gulfport Authorities", pcName: "Party" });
 ```
 
 ## Notes
 
+- An NPC or PC is either a Campaign Builder entry (`npcUuid` / `pcUuid`) or a free-text name (`npcName` / `pcName`, e.g. an organisation or the whole party). A uuid always wins over a name; trackers with a manual NPC get their own entry in the panel's NPC filter.
 - Tracker data is stored in a world setting (the Campaign Builder keeps its entries in compendium packs).
   Like every world setting it is technically readable by all connected clients; the module's interface is GM only.
 - A Campaign Builder setting export does not include the trackers.

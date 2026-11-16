@@ -2,7 +2,6 @@
  * All classes are prefixed fcb-npc-trackers. Colors come from Foundry's CSS variables where possible. */
 
 .fcb-npc-trackers {
-  --fcb-npc-trackers-box-width: 34px;
   --fcb-npc-trackers-box-height: 20px;
   --fcb-npc-trackers-border: var(--color-border-dark-4, #555);
   --fcb-npc-trackers-muted: var(--color-text-subtle, #888);
@@ -90,6 +89,8 @@
   border-radius: 6px;
   padding: 6px 8px 8px;
   background: rgba(0, 0, 0, 0.08);
+  /* Lets the layout below react to the width of the card (= window width), not of the viewport. */
+  container-type: inline-size;
 }
 
 .fcb-npc-trackers-card.is-aside {
@@ -148,35 +149,42 @@
 .fcb-npc-trackers-card__bars {
   display: flex;
   gap: 10px;
-  flex: 0 0 auto;
+  flex: 3 1 0;
+  min-width: 0;
 }
 
 /* ---------- Bars ---------- */
 
+/* Bars share the available width equally, within a minimum and maximum width. */
 .fcb-npc-trackers-bar {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 4px;
+  flex: 1 1 0;
+  min-width: 56px;
+  max-width: 240px;
 }
 
 .fcb-npc-trackers-bar__label {
-  max-width: calc(var(--fcb-npc-trackers-box-width) + 24px);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  text-align: center;
+  line-height: 1.15;
   font-size: var(--font-size-12, 12px);
   color: var(--fcb-npc-trackers-muted);
 }
 
+/* Boxes sit at the bottom so that bars with different step counts share one baseline
+   and their controls line up. */
 .fcb-npc-trackers-bar__boxes {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  margin-top: auto;
 }
 
 .fcb-npc-trackers-box {
-  width: var(--fcb-npc-trackers-box-width);
+  width: 100%;
   height: var(--fcb-npc-trackers-box-height);
   min-height: 0;
   padding: 0;
@@ -202,6 +210,7 @@
 .fcb-npc-trackers-bar__controls {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
 }
 
@@ -215,8 +224,8 @@
 /* ---------- Log ---------- */
 
 .fcb-npc-trackers-card__log {
-  flex: 1;
-  min-width: 0;
+  flex: 2 1 0;
+  min-width: 150px;
   max-height: 190px;
   overflow-y: auto;
   margin: 0;
@@ -255,7 +264,36 @@
   font-size: var(--font-size-12, 12px);
 }
 
+/* Narrow window: the log moves below the bars. */
+@container (max-width: 440px) {
+  .fcb-npc-trackers-card__body {
+    flex-direction: column;
+  }
+
+  .fcb-npc-trackers-card__bars {
+    flex: 0 0 auto;
+  }
+
+  .fcb-npc-trackers-bar {
+    max-width: none;
+  }
+
+  .fcb-npc-trackers-card__log {
+    flex: 0 0 auto;
+    max-height: 140px;
+  }
+}
+
 /* ---------- Form ---------- */
+
+.fcb-npc-trackers-form .form-fields {
+  flex-wrap: wrap;
+}
+
+.fcb-npc-trackers-form .form-fields input[type="text"][name$="Name"] {
+  flex: 1 1 12em;
+  min-width: 0;
+}
 
 .fcb-npc-trackers-form .form-fields input[type="search"] {
   flex: 0 0 9em;

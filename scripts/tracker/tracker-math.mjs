@@ -29,8 +29,10 @@ import { DEFAULT_BAR_COLOR, LIMITS } from "../constants.mjs";
  * @typedef {object} Tracker
  * @property {string} id
  * @property {string} name
- * @property {string} npcUuid
- * @property {string|null} pcUuid
+ * @property {string} npcUuid      CB entry of the NPC; empty for a manual NPC.
+ * @property {string} npcName      Manual NPC name, used while `npcUuid` is empty.
+ * @property {string|null} pcUuid  CB entry of the PC; null when none.
+ * @property {string} pcName       Manual PC name, used while `pcUuid` is empty.
  * @property {boolean} active
  * @property {Bar[]} bars
  * @property {LogEntry[]} log
@@ -38,6 +40,9 @@ import { DEFAULT_BAR_COLOR, LIMITS } from "../constants.mjs";
  */
 
 export class TrackerMath {
+  /** Prefix of filter keys that stand for a manual NPC name. */
+  static NAME_KEY_PREFIX = "name:";
+
   /**
    * Clamp a number to an integer range. Non-finite input yields `min`.
    * @param {number} value
@@ -114,8 +119,21 @@ export class TrackerMath {
   }
 
   /**
-   * Return a cleaned copy of a tracker: bar count, steps and values within their
-   * limits, invalid colors replaced by the default, log trimmed. Idempotent. Does not touch ids, names or uuids.
+   * Grouping key of a tracker's NPC: the CB uuid, or `name:<text>` for a manual NPC, or "" when
+   * neither is set. Used by the panel filter.
+   * @param {Pick<Tracker, "npcUuid"|"npcName">} tracker
+   * @returns {string}
+   */
+  static npcKey(tracker) {
+    if (tracker.npcUuid) return tracker.npcUuid;
+    const name = String(tracker.npcName ?? "").trim();
+    return name ? `${TrackerMath.NAME_KEY_PREFIX}${name}` : "";
+  }
+
+  /**
+   * Return a cleaned copy of a tracker: bar count, steps and values within their limits, invalid
+   * colors replaced by the default, log trimmed, manual names trimmed and cut to LIMITS.MAX_NAME.
+   * Idempotent. Does not touch ids or uuids.
    * @param {Tracker} tracker
    * @returns {Tracker}
    */
@@ -125,6 +143,13 @@ export class TrackerMath {
       const color = TrackerMath.isColor(bar.color) ? bar.color : DEFAULT_BAR_COLOR;
       return { ...bar, steps, color, value: TrackerMath.clampInt(bar.value, 0, steps) };
     });
-    return { ...tracker, bars, log: TrackerMath.trimLog(tracker.log ?? []) };
+    const clean = value => String(value ?? "").trim().slice(0, LIMITS.MAX_NAME);
+    return {
+      ...tracker,
+      npcName: clean(tracker.npcName),
+      pcName: clean(tracker.pcName),
+      bars,
+      log: TrackerMath.trimLog(tracker.log ?? [])
+    };
   }
 }

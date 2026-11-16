@@ -77,6 +77,10 @@ Requirements (agreed with the maintainer):
   No other globals.
 - Bar values are integers within `0..steps`. Never store fractions.
 
+## NPC / PC identity
+
+An NPC or PC is a CB entry (`npcUuid`/`pcUuid`) or a manual name (`npcName`/`pcName`); a uuid always wins and clears the name. Never compare `npcUuid` directly for grouping or filtering: use `TrackerMath.npcKey(tracker)` (uuid, or `name:<text>` for manual NPCs). Manual names are never orphans (`findOrphans` skips them) and never go through the bridge.
+
 ## Layout
 
 ```
@@ -161,6 +165,8 @@ Re-check with every CB release (repo `dovrosenberg/fvtt-campaign-builder`):
 - Partial `tracker-card.hbs` is preloaded through the panel part's `templates` option and used as
   `{{> "modules/fcb-npc-trackers/templates/tracker-card.hbs" this}}`.
 - Entry points: keybinding `Shift+Alt+N` (rebindable) and a button in the scene controls (token group).
+
+Responsive layout: the card is a size container (`container-type: inline-size`); bars use `flex: 1 1 0` with min/max width, the log moves below the bars via `@container`. Do not use viewport media queries and no fixed box widths.
 
 ## Release
 

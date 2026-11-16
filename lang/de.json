@@ -61,10 +61,13 @@
       "newBar": "Neuer Balken",
       "save": "Speichern",
       "cancel": "Abbrechen",
-      "noEntries": "Keine NSCs in den Compendien des Campaign Builders („FCB - …“) gefunden. Lege zuerst NSCs im Campaign Builder an und klicke dann auf „Liste aktualisieren“.",
-      "needNpc": "Bitte einen NSC wählen.",
+      "noEntries": "Keine NSCs in den Kompendien des Campaign Builders („FCB - …“) gefunden. Du kannst trotzdem einen eigenen Namen eingeben oder nach dem Anlegen von NSCs „Liste aktualisieren“ drücken.",
+      "needNpc": "Bitte einen NSC wählen oder einen Namen eingeben.",
       "needBarLabel": "Jeder Balken braucht einen Namen.",
-      "refresh": "Liste aktualisieren"
+      "refresh": "Liste aktualisieren",
+      "customName": "— eigener Name —",
+      "npcNamePlaceholder": "Eigener Name, z. B. Gulfport Behörden",
+      "pcNamePlaceholder": "Eigener Name, z. B. Heldengruppe"
     }
   }
 }

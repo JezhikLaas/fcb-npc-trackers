@@ -29,7 +29,9 @@ export class TrackerData extends DataModel {
       id: new fields.StringField({ required: true, blank: false, initial: newId }),
       name: new fields.StringField({ required: true, blank: true, initial: "" }),
       npcUuid: new fields.StringField({ required: true, blank: true, initial: "" }),
+      npcName: new fields.StringField({ required: true, blank: true, initial: "", maxLength: LIMITS.MAX_NAME }),
       pcUuid: new fields.StringField({ required: true, nullable: true, blank: true, initial: null }),
+      pcName: new fields.StringField({ required: true, blank: true, initial: "", maxLength: LIMITS.MAX_NAME }),
       active: new fields.BooleanField({ required: true, initial: true }),
       bars: new fields.ArrayField(
         new fields.SchemaField({

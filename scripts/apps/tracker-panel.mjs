@@ -96,13 +96,13 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
     const all = TrackerStore.list();
     await this.#resolveNames(all);
 
-    const npcUuids = new Set(all.map(t => t.npcUuid));
-    if (this.#filterNpc) npcUuids.add(this.#filterNpc);
-    const npcChoices = [...npcUuids]
-      .map(uuid => ({ value: uuid, label: this.#displayName(uuid, "missingNpc") }))
+    const npcKeys = new Set(all.map(t => TrackerMath.npcKey(t)).filter(Boolean));
+    if (this.#filterNpc) npcKeys.add(this.#filterNpc);
+    const npcChoices = [...npcKeys]
+      .map(key => ({ value: key, label: this.#keyLabel(key) }))
       .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang));
 
-    const visible = all.filter(t => !this.#filterNpc || t.npcUuid === this.#filterNpc);
+    const visible = all.filter(t => !this.#filterNpc || TrackerMath.npcKey(t) === this.#filterNpc);
     return Object.assign(context, {
       npcChoices,
       filter: this.#filterNpc,
@@ -162,7 +162,7 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   async #resolveNames(trackers) {
     const wanted = new Set(trackers.flatMap(t => [t.npcUuid, t.pcUuid]).filter(Boolean));
-    if (this.#filterNpc) wanted.add(this.#filterNpc);
+    if (this.#filterNpc && !this.#filterNpc.startsWith(TrackerMath.NAME_KEY_PREFIX)) wanted.add(this.#filterNpc);
     await Promise.all(
       [...wanted]
         .filter(uuid => !this.#names.has(uuid))
@@ -171,6 +171,27 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
           this.#names.set(uuid, entry ? { name: entry.name, playerName: CampaignBuilderBridge.playerName(entry) } : null);
         })
     );
+  }
+
+  /**
+   * Label of a filter key (see TrackerMath.npcKey): a manual name or the name of a CB entry.
+   * @param {string} key
+   * @returns {string}
+   */
+  #keyLabel(key) {
+    const prefix = TrackerMath.NAME_KEY_PREFIX;
+    return key.startsWith(prefix) ? key.slice(prefix.length) : this.#displayName(key, "missingNpc");
+  }
+
+  /**
+   * Display name of an NPC or PC: the CB name while a uuid is set, otherwise the manual name.
+   * @param {string|null} uuid
+   * @param {string} manualName
+   * @param {"missingNpc"|"missingPc"} missingKey
+   * @returns {string}
+   */
+  #who(uuid, manualName, missingKey) {
+    return uuid ? this.#displayName(uuid, missingKey) : manualName;
   }
 
   /**
@@ -200,10 +221,10 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
     return {
       id: tracker.id,
       active: tracker.active,
-      npcName: this.#displayName(tracker.npcUuid, "missingNpc"),
-      npcMissing: this.#names.get(tracker.npcUuid) == null,
-      hasPc: Boolean(tracker.pcUuid),
-      pcName: tracker.pcUuid ? this.#displayName(tracker.pcUuid, "missingPc") : "",
+      npcName: this.#who(tracker.npcUuid, tracker.npcName, "missingNpc"),
+      npcMissing: Boolean(tracker.npcUuid) && this.#names.get(tracker.npcUuid) == null,
+      hasPc: Boolean(tracker.pcUuid || tracker.pcName),
+      pcName: this.#who(tracker.pcUuid, tracker.pcName, "missingPc"),
       pcMissing: Boolean(tracker.pcUuid) && this.#names.get(tracker.pcUuid) == null,
       playerName: tracker.pcUuid ? (this.#names.get(tracker.pcUuid)?.playerName ?? "") : "",
       subtitle: tracker.name ? t(tracker.name) : "",
@@ -296,8 +317,9 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
     const { trackerId } = target.dataset;
     const tracker = TrackerStore.get(trackerId);
     if (!tracker) return;
-    const npc = this.#displayName(tracker.npcUuid, "missingNpc");
-    const name = tracker.pcUuid ? `${npc} ↔ ${this.#displayName(tracker.pcUuid, "missingPc")}` : npc;
+    const npc = this.#who(tracker.npcUuid, tracker.npcName, "missingNpc");
+    const pc = this.#who(tracker.pcUuid, tracker.pcName, "missingPc");
+    const name = pc ? `${npc} ↔ ${pc}` : npc;
     if (await TrackerPanel.#run(TrackerStore.remove(trackerId))) this.#startUndo(trackerId, name);
   }
 

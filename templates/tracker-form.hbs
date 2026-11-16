@@ -10,14 +10,19 @@
   <div class="form-group">
     <label for="fcb-npc-trackers-npc">{{localize "FCB_NPC_TRACKERS.Form.npc"}}</label>
     <div class="form-fields">
-      {{#if isEdit}}
-        <span>{{npcName}}</span>
+      {{#if npcFixed}}
+        <span>{{npcLabel}}</span>
       {{else}}
-        <input type="search" data-filter="npcUuid" placeholder="{{localize 'FCB_NPC_TRACKERS.Form.search'}}"
-               aria-label="{{localize 'FCB_NPC_TRACKERS.Form.search'}}">
-        <select id="fcb-npc-trackers-npc" name="npcUuid" required>
-          {{selectOptions npcChoices selected=npcUuid valueAttr="value" labelAttr="label" blank=noneLabel}}
-        </select>
+        {{#unless isEdit}}
+          <input type="search" data-filter="npcUuid" placeholder="{{localize 'FCB_NPC_TRACKERS.Form.search'}}"
+                 aria-label="{{localize 'FCB_NPC_TRACKERS.Form.search'}}">
+          <select id="fcb-npc-trackers-npc" name="npcUuid">
+            {{selectOptions npcChoices selected=npcUuid valueAttr="value" labelAttr="label" blank=customNpcLabel}}
+          </select>
+        {{/unless}}
+        <input type="text" name="npcName" value="{{npcName}}" maxlength="{{maxName}}"
+               placeholder="{{localize 'FCB_NPC_TRACKERS.Form.npcNamePlaceholder'}}"
+               aria-label="{{localize 'FCB_NPC_TRACKERS.Form.npcNamePlaceholder'}}" {{disabled npcUuid}}>
       {{/if}}
     </div>
   </div>
@@ -30,6 +35,9 @@
       <select id="fcb-npc-trackers-pc" name="pcUuid">
         {{selectOptions pcChoices selected=pcUuid valueAttr="value" labelAttr="label" blank=noPcLabel}}
       </select>
+      <input type="text" name="pcName" value="{{pcName}}" maxlength="{{maxName}}"
+             placeholder="{{localize 'FCB_NPC_TRACKERS.Form.pcNamePlaceholder'}}"
+             aria-label="{{localize 'FCB_NPC_TRACKERS.Form.pcNamePlaceholder'}}" {{disabled pcUuid}}>
     </div>
   </div>
 
@@ -89,7 +97,7 @@
   <button type="button" data-action="cancel">
     <i class="fa-solid fa-xmark" inert></i> {{localize "FCB_NPC_TRACKERS.Form.cancel"}}
   </button>
-  <button type="submit" {{disabled blocked}}>
+  <button type="submit">
     <i class="fa-solid fa-floppy-disk" inert></i> {{localize "FCB_NPC_TRACKERS.Form.save"}}
   </button>
 </footer>

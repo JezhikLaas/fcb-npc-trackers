@@ -138,6 +138,37 @@ describe("TrackerMath.normalize", () => {
   });
 });
 
+describe("TrackerMath.npcKey", () => {
+  it("prefers the CB uuid", () => {
+    assert.equal(TrackerMath.npcKey({ npcUuid: "u1", npcName: "Ignored" }), "u1");
+  });
+  it("uses the prefixed manual name when there is no uuid", () => {
+    assert.equal(TrackerMath.npcKey({ npcUuid: "", npcName: "  Gulfport Behörden " }), "name:Gulfport Behörden");
+  });
+  it("is empty without uuid and name", () => {
+    assert.equal(TrackerMath.npcKey({ npcUuid: "", npcName: "  " }), "");
+    assert.equal(TrackerMath.npcKey({ npcUuid: "" }), "");
+  });
+});
+
+describe("TrackerMath.normalize (manual names)", () => {
+  it("trims manual names and cuts them to the maximum length", () => {
+    const result = TrackerMath.normalize({
+      npcName: "  Heldengruppe ",
+      pcName: "x".repeat(LIMITS.MAX_NAME + 20),
+      bars: [],
+      log: []
+    });
+    assert.equal(result.npcName, "Heldengruppe");
+    assert.equal(result.pcName.length, LIMITS.MAX_NAME);
+  });
+  it("turns missing names (old trackers) into empty strings", () => {
+    const result = TrackerMath.normalize({ bars: [], log: [] });
+    assert.equal(result.npcName, "");
+    assert.equal(result.pcName, "");
+  });
+});
+
 describe("TrackerTemplates.build", () => {
   let counter = 0;
   const idFactory = () => `id${++counter}`;
@@ -164,6 +195,16 @@ describe("TrackerTemplates.build", () => {
     assert.equal(tracker.pcUuid, null);
     assert.equal(tracker.name, template.name);
     assert.equal(TrackerTemplates.build(template, { npcUuid: "npc", name: "Custom", idFactory }).name, "Custom");
+  });
+  it("stores manual names and defaults them to empty", () => {
+    const template = TrackerTemplates.BUILTIN[0];
+    const manual = TrackerTemplates.build(template, { npcName: "Gulfport Behörden", pcName: "Heldengruppe", idFactory });
+    assert.equal(manual.npcUuid, "");
+    assert.equal(manual.npcName, "Gulfport Behörden");
+    assert.equal(manual.pcName, "Heldengruppe");
+    const plain = TrackerTemplates.build(template, { npcUuid: "npc", idFactory });
+    assert.equal(plain.npcName, "");
+    assert.equal(plain.pcName, "");
   });
   it("does not mutate the built-in template", () => {
     const template = TrackerTemplates.BUILTIN[0];

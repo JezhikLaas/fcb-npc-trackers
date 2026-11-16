@@ -16,7 +16,7 @@ import { TrackerTemplates } from "./tracker-templates.mjs";
 
 /**
  * @typedef {object} TrackerFilter
- * @property {string} [npcUuid]     Only trackers of this NPC.
+ * @property {string} [npcUuid]     Only trackers of this NPC: a CB uuid or the key `name:<text>` of a manual NPC (see TrackerMath.npcKey).
  * @property {string} [pcUuid]      Only trackers with this PC.
  * @property {boolean} [activeOnly] Only trackers shown in the session panel.
  */
@@ -35,7 +35,7 @@ export class TrackerStore {
    */
   static list({ npcUuid, pcUuid, activeOnly = false } = {}) {
     return ModuleSettings.trackers.filter(
-      t => (!npcUuid || t.npcUuid === npcUuid) && (!pcUuid || t.pcUuid === pcUuid) && (!activeOnly || t.active)
+      t => (!npcUuid || TrackerMath.npcKey(t) === npcUuid) && (!pcUuid || t.pcUuid === pcUuid) && (!activeOnly || t.active)
     );
   }
 
@@ -55,20 +55,24 @@ export class TrackerStore {
   /**
    * Create a tracker from a template.
    * @param {object} options
-   * @param {string} options.npcUuid
+   * @param {string} [options.npcUuid]  CB entry of the NPC. Either this or `npcName` is required.
+   * @param {string} [options.npcName]  Manual NPC name, used when there is no `npcUuid`.
    * @param {string|null} [options.pcUuid]
+   * @param {string} [options.pcName]  Manual PC name, used when there is no `pcUuid`.
    * @param {string} [options.templateId]  Defaults to the built-in sympathy/antipathy template.
    * @param {string} [options.name]
    * @returns {Promise<Tracker>}
    */
-  static createFromTemplate({ npcUuid, pcUuid = null, templateId = DEFAULT_TEMPLATE_ID, name }) {
+  static createFromTemplate({ npcUuid = "", npcName = "", pcUuid = null, pcName = "", templateId = DEFAULT_TEMPLATE_ID, name }) {
     return TrackerStore.#mutate(trackers => {
       const template = TrackerTemplates.find(TrackerStore.templates, templateId);
       if (!template) throw new Error(`Unknown tracker template "${templateId}".`);
-      if (!npcUuid) throw new Error("A tracker needs an NPC.");
+      if (!npcUuid && !String(npcName).trim()) throw new Error("A tracker needs an NPC.");
       const tracker = TrackerTemplates.build(template, {
         npcUuid,
+        npcName: npcUuid ? "" : npcName,
         pcUuid,
+        pcName: pcUuid ? "" : pcName,
         name,
         idFactory: () => foundry.utils.randomID()
       });
@@ -80,21 +84,29 @@ export class TrackerStore {
   /**
    * Create a tracker with explicitly given bars (the create dialog).
    * @param {object} options
-   * @param {string} options.npcUuid
+   * @param {string} [options.npcUuid]  CB entry of the NPC. Either this or `npcName` is required.
+   * @param {string} [options.npcName]  Manual NPC name, used when there is no `npcUuid`.
    * @param {string|null} [options.pcUuid]
+   * @param {string} [options.pcName]  Manual PC name, used when there is no `pcUuid`.
    * @param {string} [options.name]  Optional tracker name; may be empty.
    * @param {{label: string, steps: number, color: string}[]} options.bars  1..LIMITS.MAX_BARS bars.
    * @returns {Promise<Tracker>}
    */
-  static create({ npcUuid, pcUuid = null, name = "", bars }) {
+  static create({ npcUuid = "", npcName = "", pcUuid = null, pcName = "", name = "", bars }) {
     return TrackerStore.#mutate(trackers => {
-      if (!npcUuid) throw new Error("A tracker needs an NPC.");
+      if (!npcUuid && !String(npcName).trim()) throw new Error("A tracker needs an NPC.");
       if (!bars?.length || bars.length > LIMITS.MAX_BARS) {
         throw new Error(`A tracker needs 1 to ${LIMITS.MAX_BARS} bars.`);
       }
       const tracker = TrackerTemplates.build(
         { id: "custom", name, bars },
-        { npcUuid, pcUuid: pcUuid || null, name: String(name).trim(), idFactory: () => foundry.utils.randomID() }
+        {
+          npcUuid,
+          npcName: npcUuid ? "" : npcName,
+          pcUuid: pcUuid || null,
+          pcName: pcUuid ? "" : pcName,
+          name: String(name).trim(),
+          idFactory: () => foundry.utils.randomID() }
       );
       trackers.push(tracker);
       return { result: tracker, changed: true };
@@ -102,22 +114,30 @@ export class TrackerStore {
   }
 
   /**
-   * Edit name, PC and bars of a tracker. Bars carrying the id of an existing bar keep their
+   * Edit name, manual names, PC and bars of a tracker. Bars carrying the id of an existing bar keep their
    * value; bars without a known id are new (value 0); existing bars missing from `bars` are
    * removed. Log entries stay (they keep their label snapshot).
    * @param {string} trackerId
    * @param {object} changes
    * @param {string} [changes.name]
+   * @param {string} [changes.npcName]  Only applied to trackers without an NPC uuid.
    * @param {string|null} [changes.pcUuid]
+   * @param {string} [changes.pcName]  Applied only while the tracker has no PC uuid.
    * @param {{id?: string, label: string, steps: number, color: string}[]} [changes.bars]
    * @returns {Promise<boolean>}  Whether the tracker exists.
    */
-  static updateTracker(trackerId, { name, pcUuid, bars }) {
+  static updateTracker(trackerId, { name, npcName, pcUuid, pcName, bars }) {
     return TrackerStore.#mutate(trackers => {
       const tracker = trackers.find(t => t.id === trackerId);
       if (!tracker) return { result: false, changed: false };
       if (name !== undefined) tracker.name = String(name).trim();
+      if (npcName !== undefined && !tracker.npcUuid) {
+        if (!String(npcName).trim()) throw new Error("A tracker needs an NPC.");
+        tracker.npcName = String(npcName).trim();
+      }
       if (pcUuid !== undefined) tracker.pcUuid = pcUuid || null;
+      if (pcName !== undefined) tracker.pcName = tracker.pcUuid ? "" : String(pcName).trim();
+      if (pcUuid) tracker.pcName = "";
       if (bars) {
         if (!bars.length || bars.length > LIMITS.MAX_BARS) {
           throw new Error(`A tracker needs 1 to ${LIMITS.MAX_BARS} bars.`);
@@ -238,7 +258,7 @@ export class TrackerStore {
   }
 
   /**
-   * Find trackers whose NPC or PC page no longer exists in the Campaign Builder.
+   * Find trackers whose NPC or PC page no longer exists in the Campaign Builder (manual names are never orphaned).
    * Nothing is changed or removed.
    * @returns {Promise<Map<string, {npcMissing: boolean, pcMissing: boolean}>>}  Keyed by tracker id; only broken trackers.
    */
@@ -246,7 +266,7 @@ export class TrackerStore {
     const orphans = new Map();
     for (const tracker of TrackerStore.list()) {
       const [npc, pc] = await Promise.all([
-        CampaignBuilderBridge.resolve(tracker.npcUuid),
+        tracker.npcUuid ? CampaignBuilderBridge.resolve(tracker.npcUuid) : Promise.resolve(true),
         tracker.pcUuid ? CampaignBuilderBridge.resolve(tracker.pcUuid) : Promise.resolve(true)
       ]);
       if (!npc || !pc) orphans.set(tracker.id, { npcMissing: !npc, pcMissing: !pc });
