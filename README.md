@@ -21,7 +21,7 @@ of the latest release into the field at the bottom and click **Install**:
 https://github.com/JezhikLaas/fcb-npc-trackers/releases/latest/download/module.json
 ```
 
-Then enable **Daggerheart: Campaign Currency** in your world.
+Then enable **Campaign Builder: NPC Trackers** in your world.
 
 ## AI Info
 This module has been developed with the help of Claude Code.
