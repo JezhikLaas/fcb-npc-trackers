@@ -53,6 +53,7 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
       stepBar: TrackerPanel.#onStepBar,
       toggleActive: TrackerPanel.#onToggleActive,
       removeTracker: TrackerPanel.#onRemoveTracker,
+      removeLogEntry: TrackerPanel.#onRemoveLogEntry,
       undoRemove: TrackerPanel.#onUndoRemove,
       addTracker: TrackerPanel.#onAddTracker,
       editTracker: TrackerPanel.#onEditTracker
@@ -321,6 +322,22 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
     const pc = this.#who(tracker.pcUuid, tracker.pcName, "missingPc");
     const name = pc ? `${npc} ↔ ${pc}` : npc;
     if (await TrackerPanel.#run(TrackerStore.remove(trackerId))) this.#startUndo(trackerId, name);
+  }
+
+  /**
+   * Delete a log entry after confirmation. The bar values stay unchanged.
+   * @this {TrackerPanel}
+   * @param {PointerEvent} _event
+   * @param {HTMLElement} target  Button with `data-tracker-id` and `data-log-id`.
+   */
+  static async #onRemoveLogEntry(_event, target) {
+    const { trackerId, logId } = target.dataset;
+    const ok = await foundry.applications.api.DialogV2.confirm({
+      window: { title: `${I18N_PREFIX}.Card.removeEntry` },
+      content: `<p>${game.i18n.localize(`${I18N_PREFIX}.Card.removeEntryConfirm`)}</p>`,
+      rejectClose: false
+    });
+    if (ok) await TrackerPanel.#run(TrackerStore.removeLogEntry(trackerId, logId));
   }
 
   /**

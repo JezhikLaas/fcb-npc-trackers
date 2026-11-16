@@ -54,6 +54,9 @@
           <span class="fcb-npc-trackers-log-entry__change">
             <i class="fa-solid {{icon}}" inert></i> {{label}} {{from}} → {{to}}
           </span>
+          <button type="button" class="icon fa-solid fa-trash fcb-npc-trackers-log-entry__remove" data-action="removeLogEntry"
+                  data-tracker-id="{{trackerId}}" data-log-id="{{id}}"
+                  data-tooltip="FCB_NPC_TRACKERS.Card.removeEntry" aria-label="{{localize 'FCB_NPC_TRACKERS.Card.removeEntry'}}"></button>
           <input type="text" class="fcb-npc-trackers-log-entry__note" data-note data-tracker-id="{{trackerId}}" data-log-id="{{id}}"
                  value="{{note}}" maxlength="500" placeholder="{{localize 'FCB_NPC_TRACKERS.Card.notePlaceholder'}}">
         </li>

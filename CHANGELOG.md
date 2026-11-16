@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Delete log entries**: each log entry has a trash icon next to its heading; after confirmation the entry (and its note) is removed. Current bar values do not change. API: `removeLogEntry(trackerId, logId)`.
+- Create/edit dialog is wider and puts the "own name" field on its own line so the selects stay readable.
+
 - **Responsive bars**: the bar columns share the width of the window (56–240 px each); labels wrap instead of being cut off, bars of different heights share a baseline so the −/+ controls line up, and in a narrow window the log moves below the bars.
 - **Own names**: the NPC and the player character can be a free-text name (e.g. "Gulfport Authorities", "Party") instead of a Campaign Builder entry. New data fields `npcName`/`pcName`, `createTracker({ npcName, pcName })`; existing trackers are unaffected. The dialog no longer blocks when the Campaign Builder has no NPCs.
 

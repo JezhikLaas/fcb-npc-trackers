@@ -238,7 +238,7 @@
 
 .fcb-npc-trackers-log-entry {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   column-gap: 8px;
   row-gap: 2px;
   align-items: baseline;
@@ -256,6 +256,16 @@
 
 .fcb-npc-trackers-log-entry__change i {
   color: var(--fcb-npc-trackers-color);
+}
+
+.fcb-npc-trackers-log-entry__remove {
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+  padding: 0;
+  line-height: 1;
+  font-size: 11px;
+  align-self: center;
 }
 
 .fcb-npc-trackers-log-entry__note {
@@ -290,13 +300,19 @@
   flex-wrap: wrap;
 }
 
+/* Search and select share the first line (the select gets the room); the own-name input takes the second. */
 .fcb-npc-trackers-form .form-fields input[type="text"][name$="Name"] {
-  flex: 1 1 12em;
+  flex: 1 1 100%;
   min-width: 0;
 }
 
 .fcb-npc-trackers-form .form-fields input[type="search"] {
-  flex: 0 0 9em;
+  flex: 0 0 8em;
+}
+
+.fcb-npc-trackers-form .form-fields select[name$="Uuid"] {
+  flex: 1 1 12em;
+  min-width: 12em;
 }
 
 .fcb-npc-trackers-form__bars {

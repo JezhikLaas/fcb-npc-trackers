@@ -108,6 +108,16 @@ class TrackerApi {
   }
 
   /**
+   * Delete a log entry including its note. Bar values stay as they are.
+   * @param {string} trackerId
+   * @param {string} logId
+   * @returns {Promise<boolean>}
+   */
+  removeLogEntry(trackerId, logId) {
+    return TrackerStore.removeLogEntry(trackerId, logId);
+  }
+
+  /**
    * Show or hide a tracker in the session panel.
    * @param {string} trackerId
    * @param {boolean} active

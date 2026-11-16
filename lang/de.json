@@ -41,7 +41,9 @@
       "decrease": "Eine Stufe niedriger",
       "boxLabel": "{label}: Stufe {index} von {steps}",
       "notePlaceholder": "Notiz hinzufügen…",
-      "noChanges": "Noch keine Änderungen."
+      "noChanges": "Noch keine Änderungen.",
+      "removeEntry": "Verlaufseintrag löschen",
+      "removeEntryConfirm": "Diesen Verlaufseintrag samt Notiz löschen? Die aktuellen Werte des Trackers bleiben unverändert."
     },
     "Form": {
       "titleCreate": "Neuer Tracker",

@@ -68,7 +68,7 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
       icon: "fa-solid fa-people-arrows",
       contentClasses: ["standard-form"]
     },
-    position: { width: 560, height: "auto" },
+    position: { width: 620, height: "auto" },
     form: {
       handler: TrackerForm.#onForm,
       submitOnChange: true,

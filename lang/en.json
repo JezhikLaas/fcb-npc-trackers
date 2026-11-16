@@ -41,7 +41,9 @@
       "decrease": "One step down",
       "boxLabel": "{label}: step {index} of {steps}",
       "notePlaceholder": "Add note…",
-      "noChanges": "No changes yet."
+      "noChanges": "No changes yet.",
+      "removeEntry": "Delete log entry",
+      "removeEntryConfirm": "Delete this log entry including its note? The current values of the tracker stay unchanged."
     },
     "Form": {
       "titleCreate": "New tracker",

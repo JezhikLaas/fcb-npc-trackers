@@ -211,6 +211,22 @@ export class TrackerStore {
   }
 
   /**
+   * Delete one log entry (with its note). Bar values are not touched.
+   * @param {string} trackerId
+   * @param {string} logId
+   * @returns {Promise<boolean>}  Whether the entry existed.
+   */
+  static removeLogEntry(trackerId, logId) {
+    return TrackerStore.#mutate(trackers => {
+      const tracker = trackers.find(t => t.id === trackerId);
+      const index = tracker?.log.findIndex(l => l.id === logId) ?? -1;
+      if (index < 0) return { result: false, changed: false };
+      tracker.log.splice(index, 1);
+      return { result: true, changed: true };
+    });
+  }
+
+  /**
    * Show or hide a tracker in the session panel (prepared but set aside).
    * @param {string} trackerId
    * @param {boolean} active
