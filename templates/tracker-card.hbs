@@ -50,7 +50,9 @@
     <ol class="fcb-npc-trackers-card__log">
       {{#each log}}
         <li class="fcb-npc-trackers-log-entry" style="--fcb-npc-trackers-color: {{color}}">
-          <span class="fcb-npc-trackers-log-entry__time">{{time}}</span>
+          <span class="fcb-npc-trackers-log-entry__time" {{#if timeTooltip}}data-tooltip="{{timeTooltip}}"{{/if}}>
+            {{time}}{{#if timeSecondary}}<span class="fcb-npc-trackers-log-entry__time-real">{{timeSecondary}}</span>{{/if}}
+          </span>
           <span class="fcb-npc-trackers-log-entry__change">
             <i class="fa-solid {{icon}}" inert></i> {{label}} {{from}} → {{to}}
           </span>

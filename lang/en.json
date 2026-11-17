@@ -43,7 +43,9 @@
       "notePlaceholder": "Add note…",
       "noChanges": "No changes yet.",
       "removeEntry": "Delete log entry",
-      "removeEntryConfirm": "Delete this log entry including its note? The current values of the tracker stay unchanged."
+      "removeEntryConfirm": "Delete this log entry including its note? The current values of the tracker stay unchanged.",
+      "worldDate": "{day} {month} {year}, {time}",
+      "worldDateNoMonth": "Day {day}, year {year}, {time}"
     },
     "Form": {
       "titleCreate": "New tracker",
@@ -70,6 +72,15 @@
       "customName": "— own name —",
       "npcNamePlaceholder": "Own name, e.g. Gulfport Authorities",
       "pcNamePlaceholder": "Own name, e.g. Party"
+    },
+    "Settings": {
+      "logTime": {
+        "name": "Time in the change log",
+        "hint": "Which time log entries show. In-world time comes from the world calendar (game time); entries made before this option existed only have the real time.",
+        "both": "In-world time and real time",
+        "world": "In-world time (real time as tooltip)",
+        "real": "Real time only"
+      }
     }
   }
 }

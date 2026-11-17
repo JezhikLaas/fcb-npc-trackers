@@ -43,7 +43,9 @@
       "notePlaceholder": "Notiz hinzufügen…",
       "noChanges": "Noch keine Änderungen.",
       "removeEntry": "Verlaufseintrag löschen",
-      "removeEntryConfirm": "Diesen Verlaufseintrag samt Notiz löschen? Die aktuellen Werte des Trackers bleiben unverändert."
+      "removeEntryConfirm": "Diesen Verlaufseintrag samt Notiz löschen? Die aktuellen Werte des Trackers bleiben unverändert.",
+      "worldDate": "{day}. {month} {year}, {time}",
+      "worldDateNoMonth": "Tag {day}, Jahr {year}, {time}"
     },
     "Form": {
       "titleCreate": "Neuer Tracker",
@@ -70,6 +72,15 @@
       "customName": "— eigener Name —",
       "npcNamePlaceholder": "Eigener Name, z. B. Gulfport Behörden",
       "pcNamePlaceholder": "Eigener Name, z. B. Heldengruppe"
+    },
+    "Settings": {
+      "logTime": {
+        "name": "Zeit im Änderungslog",
+        "hint": "Welche Zeit die Logeinträge zeigen. Die Spielzeit stammt aus dem Kalender der Welt (Weltzeit); Einträge von vor dieser Option haben nur die reale Zeit.",
+        "both": "Spielzeit und reale Zeit",
+        "world": "Spielzeit (reale Zeit als Tooltip)",
+        "real": "Nur reale Zeit"
+      }
     }
   }
 }

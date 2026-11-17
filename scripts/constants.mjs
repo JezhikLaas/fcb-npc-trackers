@@ -45,7 +45,19 @@ export const SETTINGS = Object.freeze({
   /** World setting holding the custom TrackerTemplates. */
   TEMPLATES: "templates",
   /** Client setting remembering the last choices of the create dialog. */
-  LAST_CREATE: "lastCreate"
+  LAST_CREATE: "lastCreate",
+  /** World setting: which time log entries show (see LOG_TIME_MODES). */
+  LOG_TIME: "logTime"
+});
+
+/** Values of the LOG_TIME setting. */
+export const LOG_TIME_MODES = Object.freeze({
+  /** In-world time from the world calendar, real time as tooltip. */
+  WORLD: "world",
+  /** Real date and time only. */
+  REAL: "real",
+  /** In-world time with the real time below it. */
+  BOTH: "both"
 });
 
 /** Keys of this module's keybindings. */

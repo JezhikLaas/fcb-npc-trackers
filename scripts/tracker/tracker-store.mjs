@@ -8,6 +8,7 @@ import { CampaignBuilderBridge } from "../integration/campaign-builder-bridge.mj
 import { ModuleSettings } from "../settings.mjs";
 import { TrackerMath } from "./tracker-math.mjs";
 import { TrackerTemplates } from "./tracker-templates.mjs";
+import { WorldTime } from "./world-time.mjs";
 
 /**
  * @typedef {import("./tracker-math.mjs").Tracker} Tracker
@@ -313,7 +314,8 @@ export class TrackerStore {
         from: bar.value,
         to,
         note: String(note ?? "").trim(),
-        at: Date.now()
+        at: Date.now(),
+        worldTime: WorldTime.toStored(game.time?.worldTime)
       };
       bar.value = to;
       tracker.log.push(entry);

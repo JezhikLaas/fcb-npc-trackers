@@ -22,7 +22,8 @@ import { DEFAULT_BAR_COLOR, LIMITS } from "../constants.mjs";
  * @property {number} from
  * @property {number} to
  * @property {string} note     Optional free text.
- * @property {number} at       Timestamp in ms.
+ * @property {number} at       Real timestamp in ms.
+ * @property {number|null} [worldTime]  In-world time (`game.time.worldTime`, seconds) of the change; missing on old entries.
  */
 
 /**

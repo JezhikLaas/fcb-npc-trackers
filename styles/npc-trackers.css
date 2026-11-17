@@ -250,6 +250,12 @@
   font-variant-numeric: tabular-nums;
 }
 
+.fcb-npc-trackers-log-entry__time-real {
+  display: block;
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
 .fcb-npc-trackers-log-entry__change {
   font-weight: bold;
 }

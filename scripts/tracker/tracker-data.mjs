@@ -51,7 +51,8 @@ export class TrackerData extends DataModel {
           from: new fields.NumberField({ required: true, integer: true, min: 0, max: LIMITS.MAX_STEPS, initial: 0 }),
           to: new fields.NumberField({ required: true, integer: true, min: 0, max: LIMITS.MAX_STEPS, initial: 0 }),
           note: new fields.StringField({ required: true, blank: true, initial: "" }),
-          at: new fields.NumberField({ required: true, integer: true, min: 0, initial: () => Date.now() })
+          at: new fields.NumberField({ required: true, integer: true, min: 0, initial: () => Date.now() }),
+          worldTime: new fields.NumberField({ required: false, nullable: true, integer: true, initial: null })
         }),
         { required: true, initial: [] }
       ),

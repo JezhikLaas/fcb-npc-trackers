@@ -8,6 +8,8 @@ import { Logger } from "../logger.mjs";
 import { CampaignBuilderBridge } from "../integration/campaign-builder-bridge.mjs";
 import { TrackerMath } from "../tracker/tracker-math.mjs";
 import { TrackerStore } from "../tracker/tracker-store.mjs";
+import { WorldTime } from "../tracker/world-time.mjs";
+import { ModuleSettings } from "../settings.mjs";
 import { TrackerForm } from "./tracker-form.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -218,6 +220,7 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
       hour: "2-digit",
       minute: "2-digit"
     });
+    const mode = ModuleSettings.logTime;
 
     return {
       id: tracker.id,
@@ -260,9 +263,46 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
           icon: entry.to > entry.from ? "fa-arrow-up" : "fa-arrow-down",
           color: colors.get(entry.barId) ?? FALLBACK_COLOR,
           note: entry.note,
-          time: dateFormat.format(entry.at)
+          ...TrackerPanel.#logTime(entry, mode, dateFormat)
         }))
     };
+  }
+
+  /**
+   * Texts for the time of a log entry according to the LOG_TIME setting.
+   * @param {import("../tracker/tracker-math.mjs").LogEntry} entry
+   * @param {string} mode                   One of LOG_TIME_MODES.
+   * @param {Intl.DateTimeFormat} dateFormat Formatter for the real time.
+   * @returns {{time: string, timeSecondary: string, timeTooltip: string}}
+   */
+  static #logTime(entry, mode, dateFormat) {
+    const real = dateFormat.format(entry.at);
+    const world = Number.isInteger(entry.worldTime) ? TrackerPanel.#formatWorldTime(entry.worldTime) : null;
+    const display = WorldTime.display(mode, world !== null);
+    const text = kind => (kind === "world" ? world : kind === "real" ? real : "");
+    return { time: text(display.primary), timeSecondary: text(display.secondary), timeTooltip: text(display.tooltip) };
+  }
+
+  /**
+   * Format an in-world time with the world's calendar (`game.time.calendar`).
+   * @param {number} seconds  A stored `worldTime`.
+   * @returns {string|null}   The formatted date, or null when the calendar cannot handle it.
+   */
+  static #formatWorldTime(seconds) {
+    try {
+      const calendar = game.time.calendar;
+      const parts = WorldTime.parts(calendar.timeToComponents(seconds), calendar);
+      const key = parts.month === null ? "worldDateNoMonth" : "worldDate";
+      return game.i18n.format(`${I18N_PREFIX}.Card.${key}`, {
+        day: parts.day,
+        month: parts.month === null ? "" : game.i18n.localize(parts.month),
+        year: parts.year,
+        time: parts.time
+      });
+    } catch (err) {
+      Logger.warn("Cannot format world time", seconds, err);
+      return null;
+    }
   }
 
   /**

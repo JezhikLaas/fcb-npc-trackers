@@ -2,7 +2,7 @@
  * Registration of and typed access to this module's settings.
  * @module settings
  */
-import { DEFAULT_TEMPLATE_ID, HOOKS, MODULE_ID, SETTINGS } from "./constants.mjs";
+import { DEFAULT_TEMPLATE_ID, HOOKS, I18N_PREFIX, LOG_TIME_MODES, MODULE_ID, SETTINGS } from "./constants.mjs";
 import { TemplateCollection, TrackerCollection } from "./tracker/tracker-data.mjs";
 
 export class ModuleSettings {
@@ -32,6 +32,31 @@ export class ModuleSettings {
       type: Object,
       default: { npcUuid: "", pcUuid: "", templateId: DEFAULT_TEMPLATE_ID }
     });
+
+    game.settings.register(MODULE_ID, SETTINGS.LOG_TIME, {
+      name: `${I18N_PREFIX}.Settings.logTime.name`,
+      hint: `${I18N_PREFIX}.Settings.logTime.hint`,
+      scope: "world",
+      config: true,
+      restricted: true,
+      type: new foundry.data.fields.StringField({
+        required: true,
+        blank: false,
+        initial: LOG_TIME_MODES.BOTH,
+        choices: {
+          [LOG_TIME_MODES.BOTH]: `${I18N_PREFIX}.Settings.logTime.both`,
+          [LOG_TIME_MODES.WORLD]: `${I18N_PREFIX}.Settings.logTime.world`,
+          [LOG_TIME_MODES.REAL]: `${I18N_PREFIX}.Settings.logTime.real`
+        }
+      }),
+      default: LOG_TIME_MODES.BOTH,
+      onChange: () => Hooks.callAll(HOOKS.TRACKERS_UPDATED)
+    });
+  }
+
+  /** @returns {string} Which time log entries show, one of LOG_TIME_MODES. */
+  static get logTime() {
+    return game.settings.get(MODULE_ID, SETTINGS.LOG_TIME);
   }
 
   /** @returns {import("./tracker/tracker-math.mjs").Tracker[]} Source data of all stored trackers (a copy). */

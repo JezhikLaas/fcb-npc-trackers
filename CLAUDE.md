@@ -96,6 +96,7 @@ scripts/
     tracker-templates.mjs       TrackerTemplates: built-in templates + pure tracker builder
     tracker-data.mjs            DataModels: TrackerData, TrackerCollection, TemplateData, TemplateCollection
     tracker-store.mjs           TrackerStore: all reads/writes, undo buffer, orphan check
+    world-time.mjs              WorldTime: pure helpers for in-world log timestamps
   integration/
     campaign-builder-bridge.mjs CampaignBuilderBridge: the ONLY place with CB knowledge
   entry-points.mjs              EntryPoints: keybinding + scene control button (GM only)
@@ -117,6 +118,11 @@ tests/                          node:test unit tests for pure logic
   unchanged.
 - Log entries keep a **snapshot of the bar label**, so history stays readable after a bar
   is renamed or removed.
+- Log entries store the real time `at` (ms) and the in-world time `worldTime` (`game.time.worldTime`,
+  integer seconds, null/missing on old entries). The panel formats `worldTime` with `game.time.calendar`
+  (`timeToComponents`, month names localized, `years.yearZero` added; core's own `timestamp` formatter
+  ignores `yearZero`). Pure parts live in `tracker/world-time.mjs` (`WorldTime`). The world setting
+  `logTime` (`LOG_TIME_MODES`: `both` default, `world`, `real`) decides what is shown.
 - `value`/`steps` consistency (`value ≤ steps`) is enforced by `TrackerMath.normalize`,
   called in `TrackerData.cleanData` and before every save.
 - Custom hooks: `fcb-npc-trackers.trackerChanged` `(tracker, logEntry)`,
@@ -188,7 +194,7 @@ Responsive layout: the card is a size container (`container-type: inline-size`);
 ## Testing
 
 - Unit tests: `npm test` (Node ≥ 20, built-in `node:test`, no dependencies).
-  Covers `tracker-math.mjs` and `tracker-templates.mjs`. Pure logic must stay free of
+  Covers `tracker-math.mjs`, `tracker-templates.mjs` and `world-time.mjs`. Pure logic must stay free of
   Foundry globals so it remains testable this way; add tests with every change there.
 - Manual test in a v14 world with the CB: enable both modules, reload, check the console for
   `fcb-npc-trackers |` logs. API in the console, e.g.
