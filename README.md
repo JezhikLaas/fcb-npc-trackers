@@ -8,7 +8,7 @@ At a feast, Arno Pearl meets Aurelia von Halm. Depending on how the player rolep
 her **sympathy** and **antipathy** towards Arno rise or fall. One click on a box changes the value,
 and an optional note records why.
 
-> **Status:** pre-release (0.x). Requires Foundry VTT v14 and World & Campaign Builder 1.10.1 or newer.
+> **Status:** productive (0.4). Requires Foundry VTT v14 and World & Campaign Builder 1.10.1 or newer.
 
 ## Installation
 
