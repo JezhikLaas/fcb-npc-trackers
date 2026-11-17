@@ -75,6 +75,13 @@ export class ModuleSettings {
       onChange: () => ModuleSettings.refreshExportFieldChoices()
     });
 
+    game.settings.register(MODULE_ID, SETTINGS.COLLAPSED, {
+      scope: "client",
+      config: false,
+      type: Array,
+      default: []
+    });
+
     Hooks.on("updateSetting", setting => {
       if (setting.key === `${UPSTREAM.CAMPAIGN_BUILDER_ID}.${UPSTREAM.CUSTOM_FIELDS_SETTING}`) {
         ModuleSettings.refreshExportFieldChoices();
@@ -97,6 +104,21 @@ export class ModuleSettings {
     if (current && !(current in choices)) {
       choices[current] = game.i18n.format(`${I18N_PREFIX}.Settings.exportField.missing`, { field: current });
     }
+  }
+
+  /** @returns {Set<string>} Ids of the trackers collapsed in the panel (this client). */
+  static get collapsed() {
+    const ids = game.settings.get(MODULE_ID, SETTINGS.COLLAPSED);
+    return new Set(Array.isArray(ids) ? ids.filter(id => typeof id === "string") : []);
+  }
+
+  /**
+   * Remember which trackers are collapsed in the panel.
+   * @param {Iterable<string>} ids
+   * @returns {Promise<string[]>}
+   */
+  static async setCollapsed(ids) {
+    return game.settings.set(MODULE_ID, SETTINGS.COLLAPSED, [...ids]);
   }
 
   /** @returns {string} Name of the Campaign Builder character field the history is exported to; empty when not set. */

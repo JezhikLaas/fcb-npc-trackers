@@ -55,7 +55,9 @@ export const SETTINGS = Object.freeze({
   /** World setting: which time log entries show (see LOG_TIME_MODES). */
   LOG_TIME: "logTime",
   /** World setting: name of the Campaign Builder character field the history is exported to. */
-  EXPORT_FIELD: "exportField"
+  EXPORT_FIELD: "exportField",
+  /** Client setting: ids of the trackers collapsed in the panel. */
+  COLLAPSED: "collapsed"
 });
 
 /** Values of the LOG_TIME setting. */

@@ -138,6 +138,27 @@ describe("TrackerMath.normalize", () => {
   });
 });
 
+describe("TrackerMath.move", () => {
+  const items = ["a", "b", "c", "d"].map(id => ({ id }));
+  const ids = list => list.map(i => i.id).join("");
+  it("moves before or after the target", () => {
+    assert.equal(ids(TrackerMath.move(items, "d", "b", false)), "adbc");
+    assert.equal(ids(TrackerMath.move(items, "a", "c", true)), "bcad");
+    assert.equal(ids(TrackerMath.move(items, "a", "d", true)), "bcda");
+    assert.equal(ids(TrackerMath.move(items, "d", "a", false)), "dabc");
+  });
+  it("returns null when the order would not change", () => {
+    assert.equal(TrackerMath.move(items, "b", "c", false), null);
+    assert.equal(TrackerMath.move(items, "c", "b", true), null);
+    assert.equal(TrackerMath.move(items, "b", "b", true), null);
+  });
+  it("returns null for unknown ids and leaves the input untouched", () => {
+    assert.equal(TrackerMath.move(items, "x", "a", false), null);
+    assert.equal(TrackerMath.move(items, "a", "x", false), null);
+    assert.equal(ids(items), "abcd");
+  });
+});
+
 describe("TrackerMath.npcKey", () => {
   it("prefers the CB uuid", () => {
     assert.equal(TrackerMath.npcKey({ npcUuid: "u1", npcName: "Ignored" }), "u1");

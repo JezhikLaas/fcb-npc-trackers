@@ -46,7 +46,9 @@
       "removeEntry": "Verlaufseintrag löschen",
       "removeEntryConfirm": "Diesen Verlaufseintrag samt Notiz löschen? Die aktuellen Werte des Trackers bleiben unverändert.",
       "worldDate": "{day}. {month} {year}, {time}",
-      "worldDateNoMonth": "Tag {day}, Jahr {year}, {time}"
+      "worldDateNoMonth": "Tag {day}, Jahr {year}, {time}",
+      "collapse": "Einklappen",
+      "expand": "Ausklappen"
     },
     "Form": {
       "titleCreate": "Neuer Tracker",

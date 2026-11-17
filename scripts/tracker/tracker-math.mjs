@@ -132,6 +132,26 @@ export class TrackerMath {
   }
 
   /**
+   * Move an item before or after another one (by `id`). Used for reordering trackers.
+   * @template {{id: string}} T
+   * @param {T[]} items
+   * @param {string} id          Id of the item to move.
+   * @param {string} targetId    Id of the item it is dropped on.
+   * @param {boolean} after      Insert after the target instead of before it.
+   * @returns {T[]|null}         A new array, or null when nothing changes (unknown ids, same item, same place).
+   */
+  static move(items, id, targetId, after) {
+    if (id === targetId) return null;
+    const from = items.findIndex(i => i.id === id);
+    if (from < 0 || !items.some(i => i.id === targetId)) return null;
+    const rest = items.filter((_, i) => i !== from);
+    const at = rest.findIndex(i => i.id === targetId) + (after ? 1 : 0);
+    if (at === from) return null;
+    rest.splice(at, 0, items[from]);
+    return rest;
+  }
+
+  /**
    * Return a cleaned copy of a tracker: bar count, steps and values within their limits, invalid
    * colors replaced by the default, log trimmed, manual names trimmed and cut to LIMITS.MAX_NAME.
    * Idempotent. Does not touch ids or uuids.

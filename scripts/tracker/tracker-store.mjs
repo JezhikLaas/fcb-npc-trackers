@@ -243,6 +243,22 @@ export class TrackerStore {
   }
 
   /**
+   * Change the order of the trackers: move one before or after another.
+   * @param {string} trackerId
+   * @param {string} targetId  Tracker it was dropped on.
+   * @param {boolean} [after]  Place it after the target instead of before.
+   * @returns {Promise<boolean>}  Whether the order changed.
+   */
+  static move(trackerId, targetId, after = false) {
+    return TrackerStore.#mutate(trackers => {
+      const moved = TrackerMath.move(trackers, trackerId, targetId, after);
+      if (!moved) return { result: false, changed: false };
+      trackers.splice(0, trackers.length, ...moved);
+      return { result: true, changed: true };
+    });
+  }
+
+  /**
    * Remove a tracker. It can be restored with {@link TrackerStore.restore} for a few seconds.
    * @param {string} trackerId
    * @returns {Promise<boolean>}  Whether the tracker existed.

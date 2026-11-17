@@ -37,6 +37,9 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
   /** Whether the "set aside" section is expanded. */
   #asideOpen = false;
 
+  /** Tracker being dragged and whether it is in the "set aside" section. @type {{id: string, aside: boolean}|null} */
+  #drag = null;
+
   /** Id of the registered TRACKERS_UPDATED hook. @type {number|null} */
   #hookId = null;
 
@@ -60,7 +63,8 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
       undoRemove: TrackerPanel.#onUndoRemove,
       addTracker: TrackerPanel.#onAddTracker,
       editTracker: TrackerPanel.#onEditTracker,
-      exportHistory: TrackerPanel.#onExportHistory
+      exportHistory: TrackerPanel.#onExportHistory,
+      toggleCollapse: TrackerPanel.#onToggleCollapse
     }
   };
 
@@ -108,12 +112,14 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
       .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang));
 
     const visible = all.filter(t => !this.#filterNpc || TrackerMath.npcKey(t) === this.#filterNpc);
+    const collapsed = ModuleSettings.collapsed;
+    const card = t => ({ ...this.#card(t), collapsed: collapsed.has(t.id) });
     return Object.assign(context, {
       npcChoices,
       filter: this.#filterNpc,
       allLabel: game.i18n.localize(`${I18N_PREFIX}.Panel.filterAll`),
-      cards: visible.filter(t => t.active).map(t => this.#card(t)),
-      aside: visible.filter(t => !t.active).map(t => this.#card(t)),
+      cards: visible.filter(t => t.active).map(card),
+      aside: visible.filter(t => !t.active).map(card),
       asideOpen: this.#asideOpen,
       undo: this.#undo ? { trackerId: this.#undo.trackerId, name: this.#undo.name } : null
     });
@@ -136,6 +142,80 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
       },
       true
     );
+    this.#listenDragDrop();
+  }
+
+  /**
+   * Reorder trackers by dragging a card's header onto another card (delegated listeners).
+   * Cards can only be moved within their section (shown or set aside).
+   */
+  #listenDragDrop() {
+    const el = this.element;
+    el.addEventListener("dragstart", event => {
+      const header = event.target.closest?.(".fcb-npc-trackers-card__header[draggable]");
+      const card = header?.closest(".fcb-npc-trackers-card");
+      if (!card) return;
+      this.#drag = { id: card.dataset.trackerId, aside: card.classList.contains("is-aside") };
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", card.dataset.trackerId);
+      const rect = card.getBoundingClientRect();
+      event.dataTransfer.setDragImage(card, event.clientX - rect.left, event.clientY - rect.top);
+      card.classList.add("is-dragging");
+    });
+    el.addEventListener("dragover", event => {
+      const drop = this.#dropTarget(event);
+      if (!drop) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+      this.#markDrop(drop.card, drop.after);
+    });
+    el.addEventListener("dragleave", event => {
+      if (!el.contains(event.relatedTarget)) this.#markDrop(null);
+    });
+    el.addEventListener("drop", event => {
+      const drop = this.#dropTarget(event);
+      if (!drop) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const id = this.#drag.id;
+      this.#endDrag();
+      TrackerPanel.#run(TrackerStore.move(id, drop.card.dataset.trackerId, drop.after));
+    });
+    el.addEventListener("dragend", () => this.#endDrag());
+  }
+
+  /**
+   * The card a dragged tracker would be dropped on, and on which half.
+   * @param {DragEvent} event
+   * @returns {{card: HTMLElement, after: boolean}|null}  Null when there is no valid target.
+   */
+  #dropTarget(event) {
+    if (!this.#drag) return null;
+    const card = event.target.closest?.(".fcb-npc-trackers-card");
+    if (!card || card.dataset.trackerId === this.#drag.id) return null;
+    if (card.classList.contains("is-aside") !== this.#drag.aside) return null;
+    const rect = card.getBoundingClientRect();
+    return { card, after: event.clientY > rect.top + rect.height / 2 };
+  }
+
+  /**
+   * Show where a dropped card would land.
+   * @param {HTMLElement|null} card  Target card; null clears the marker.
+   * @param {boolean} [after]
+   */
+  #markDrop(card, after = false) {
+    for (const marked of this.element.querySelectorAll(".is-drop-before, .is-drop-after")) {
+      if (marked !== card) marked.classList.remove("is-drop-before", "is-drop-after");
+    }
+    card?.classList.toggle("is-drop-before", !after);
+    card?.classList.toggle("is-drop-after", after);
+  }
+
+  /** Forget the dragged card and remove all drag markers. */
+  #endDrag() {
+    this.#drag = null;
+    this.#markDrop(null);
+    this.element.querySelector(".is-dragging")?.classList.remove("is-dragging");
   }
 
   /** @override */
@@ -387,6 +467,22 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
     } finally {
       target.disabled = false;
     }
+  }
+
+  /**
+   * Collapse or expand a card; the state is remembered per client.
+   * @this {TrackerPanel}
+   * @param {PointerEvent} _event
+   * @param {HTMLElement} target  Button with `data-tracker-id`.
+   */
+  static async #onToggleCollapse(_event, target) {
+    const { trackerId } = target.dataset;
+    const known = new Set(TrackerStore.list().map(t => t.id));
+    const collapsed = new Set([...ModuleSettings.collapsed].filter(id => known.has(id)));
+    if (collapsed.has(trackerId)) collapsed.delete(trackerId);
+    else collapsed.add(trackerId);
+    await TrackerPanel.#run(ModuleSettings.setCollapsed(collapsed));
+    this.render();
   }
 
   /**

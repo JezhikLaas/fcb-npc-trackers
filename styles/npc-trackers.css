@@ -105,6 +105,43 @@
   margin-bottom: 6px;
 }
 
+.fcb-npc-trackers-card__header[draggable] {
+  cursor: grab;
+}
+
+.fcb-npc-trackers-card.is-collapsed .fcb-npc-trackers-card__header {
+  margin-bottom: 0;
+}
+
+.fcb-npc-trackers-card.is-collapsed {
+  padding-bottom: 6px;
+}
+
+.fcb-npc-trackers-card.is-dragging {
+  opacity: 0.4;
+}
+
+/* Drop marker: a line above or below the target card. */
+.fcb-npc-trackers-card.is-drop-before {
+  box-shadow: 0 -3px 0 0 var(--color-warm-2, #ff6400);
+}
+
+.fcb-npc-trackers-card.is-drop-after {
+  box-shadow: 0 3px 0 0 var(--color-warm-2, #ff6400);
+}
+
+.fcb-npc-trackers-card__toggle {
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+  padding: 0;
+  line-height: 1;
+  flex: 0 0 auto;
+  align-self: center;
+  border: none;
+  background: none;
+}
+
 .fcb-npc-trackers-card__title {
   display: flex;
   flex-wrap: wrap;

@@ -158,6 +158,11 @@ Re-check with every CB release (repo `dovrosenberg/fvtt-campaign-builder`):
   plain input in the log entry, saved on `change` (blur/Enter). Never ask for a note first.
 - **Removing is instant.** No confirmation; the panel shows an undo notice for `UNDO_SECONDS`
   (`TrackerStore.remove` / `restore`). The undo buffer is in memory only.
+- **Collapse** per card (`toggleCollapse`): a collapsed card shows only the chevron and "NPC ↔ PC". The state is a
+  client setting `collapsed` (array of tracker ids, UI state per GM, pruned of unknown ids on toggle).
+- **Order** is the order of the `trackers` array. Drag a card's header (`draggable`) onto another card; drop on the
+  upper/lower half = before/after (`TrackerStore.move` → pure `TrackerMath.move`), saved immediately. Only within the
+  same section (shown / set aside). Native HTML5 drag & drop with delegated listeners on the panel element.
 - **"Set aside"** (`active: false`) hides a tracker from the main list but keeps it in a collapsible section.
 - The panel is a singleton (`TrackerPanel.open/toggle`), re-rendered from the `trackersUpdated` hook.
   Page names are cached while it is open; a deleted CB page shows as "no longer exists".

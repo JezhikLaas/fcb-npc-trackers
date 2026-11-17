@@ -1,14 +1,26 @@
-<article class="fcb-npc-trackers-card{{#unless active}} is-aside{{/unless}}" data-tracker-id="{{id}}">
-  <header class="fcb-npc-trackers-card__header">
+<article class="fcb-npc-trackers-card{{#unless active}} is-aside{{/unless}}{{#if collapsed}} is-collapsed{{/if}}" data-tracker-id="{{id}}">
+  <header class="fcb-npc-trackers-card__header" draggable="true" data-tracker-id="{{id}}">
     <div class="fcb-npc-trackers-card__title">
+      {{#if collapsed}}
+        <button type="button" class="icon fa-solid fa-chevron-right fcb-npc-trackers-card__toggle" data-action="toggleCollapse"
+                data-tracker-id="{{id}}" aria-expanded="false"
+                data-tooltip="FCB_NPC_TRACKERS.Card.expand" aria-label="{{localize 'FCB_NPC_TRACKERS.Card.expand'}}"></button>
+      {{else}}
+        <button type="button" class="icon fa-solid fa-chevron-down fcb-npc-trackers-card__toggle" data-action="toggleCollapse"
+                data-tracker-id="{{id}}" aria-expanded="true"
+                data-tooltip="FCB_NPC_TRACKERS.Card.collapse" aria-label="{{localize 'FCB_NPC_TRACKERS.Card.collapse'}}"></button>
+      {{/if}}
       <span class="fcb-npc-trackers-card__npc{{#if npcMissing}} is-missing{{/if}}">{{npcName}}</span>
       {{#if hasPc}}
         <i class="fa-solid fa-arrows-left-right" inert></i>
         <span class="fcb-npc-trackers-card__pc{{#if pcMissing}} is-missing{{/if}}"
               {{#if playerName}}data-tooltip="{{playerName}}"{{/if}}>{{pcName}}</span>
       {{/if}}
-      {{#if subtitle}}<span class="fcb-npc-trackers-card__subtitle">{{subtitle}}</span>{{/if}}
+      {{#unless collapsed}}
+        {{#if subtitle}}<span class="fcb-npc-trackers-card__subtitle">{{subtitle}}</span>{{/if}}
+      {{/unless}}
     </div>
+    {{#unless collapsed}}
     <div class="fcb-npc-trackers-card__actions">
       <button type="button" class="icon fa-solid fa-pen" data-action="editTracker" data-tracker-id="{{id}}"
               data-tooltip="FCB_NPC_TRACKERS.Card.edit" aria-label="{{localize 'FCB_NPC_TRACKERS.Card.edit'}}"></button>
@@ -26,8 +38,10 @@
       <button type="button" class="icon fa-solid fa-trash" data-action="removeTracker" data-tracker-id="{{id}}"
               data-tooltip="FCB_NPC_TRACKERS.Card.remove" aria-label="{{localize 'FCB_NPC_TRACKERS.Card.remove'}}"></button>
     </div>
+    {{/unless}}
   </header>
 
+  {{#unless collapsed}}
   <div class="fcb-npc-trackers-card__body">
     <div class="fcb-npc-trackers-card__bars">
       {{#each bars}}
@@ -71,4 +85,5 @@
       {{/each}}
     </ol>
   </div>
+  {{/unless}}
 </article>

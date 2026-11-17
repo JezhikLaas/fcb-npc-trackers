@@ -129,6 +129,17 @@ class TrackerApi {
   }
 
   /**
+   * Change the order of the trackers: move one before or after another.
+   * @param {string} trackerId
+   * @param {string} targetId
+   * @param {boolean} [after]  Place it after the target instead of before.
+   * @returns {Promise<boolean>}  Whether the order changed.
+   */
+  moveTracker(trackerId, targetId, after) {
+    return TrackerStore.move(trackerId, targetId, after);
+  }
+
+  /**
    * Remove a tracker (restorable with {@link TrackerApi#restore} for a few seconds).
    * @param {string} trackerId
    * @returns {Promise<boolean>}
