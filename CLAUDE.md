@@ -97,6 +97,9 @@ scripts/
     tracker-data.mjs            DataModels: TrackerData, TrackerCollection, TemplateData, TemplateCollection
     tracker-store.mjs           TrackerStore: all reads/writes, undo buffer, orphan check
     world-time.mjs              WorldTime: pure helpers for in-world log timestamps
+    log-time-format.mjs         LogTimeFormat: formats log times with i18n + world calendar (panel and export)
+    history-html.mjs            HistoryHtml: pure field selection + HTML of the history export
+    history-export.mjs          HistoryExport: writes an NPC's history into the chosen CB editor field
   integration/
     campaign-builder-bridge.mjs CampaignBuilderBridge: the ONLY place with CB knowledge
   entry-points.mjs              EntryPoints: keybinding + scene control button (GM only)
@@ -143,6 +146,9 @@ Re-check with every CB release (repo `dovrosenberg/fvtt-campaign-builder`):
 - `src/classes/Documents/FCBSetting.ts` (`createCompendium`): each CB setting is a world compendium
   labelled `FCB - <name>` (GM `OWNER`, others `LIMITED`). The label prefix is how we find the packs;
   if the CB ever changes it, `UPSTREAM.PACK_LABEL_PREFIX` is the one place to adapt.
+- World setting `campaign-builder.customFields`: custom field definitions per `CustomFieldContentType`
+  (`Character = 1`), each `{name, label, fieldType, sortOrder, deleted}`; `FieldType.Editor = 2`. Values live in
+  the entry page's `system.customFields[name]` (HTML for editor fields). Constants in `UPSTREAM`.
 - CB window: `src/applications/CampaignBuilder.ts` (id `app-fcb-CampaignBuilder`); extension
   there would be DOM injection into a Vue app (phase 2, optional, fragile).
 
@@ -172,6 +178,15 @@ Re-check with every CB release (repo `dovrosenberg/fvtt-campaign-builder`):
   `{{> "modules/fcb-npc-trackers/templates/tracker-card.hbs" this}}`.
 - Entry points: keybinding `Shift+Alt+N` (rebindable) and a button in the scene controls (token group).
 
+- **History export** (`HistoryExport.exportNpc`, card button `exportHistory`): writes all trackers of the NPC into
+  the CB editor field chosen in the world setting `exportField` and **overwrites it** (the field belongs to this
+  module; agreed with the maintainer). Only editor fields (formatting) of characters, not deleted, are offered.
+  The setting is a plain `String` with a choices object refilled in place (`ModuleSettings.refreshExportFieldChoices`,
+  on `ready` and on `updateSetting` of the CB's `customFields`), so a deleted field stays stored and the export can
+  report it. Errors (no field, field missing, manual NPC, entry missing) are thrown as localized `Error`s. This is the
+  only place where we write to a CB document, and only `system.customFields.<name>`; the CB's search index catches up
+  on its own next rebuild/save.
+
 Responsive layout: the card is a size container (`container-type: inline-size`); bars use `flex: 1 1 0` with min/max width, the log moves below the bars via `@container`. Do not use viewport media queries and no fixed box widths.
 
 ## Release
@@ -194,7 +209,7 @@ Responsive layout: the card is a size container (`container-type: inline-size`);
 ## Testing
 
 - Unit tests: `npm test` (Node ≥ 20, built-in `node:test`, no dependencies).
-  Covers `tracker-math.mjs`, `tracker-templates.mjs` and `world-time.mjs`. Pure logic must stay free of
+  Covers `tracker-math.mjs`, `tracker-templates.mjs`, `world-time.mjs` and `history-html.mjs`. Pure logic must stay free of
   Foundry globals so it remains testable this way; add tests with every change there.
 - Manual test in a v14 world with the CB: enable both modules, reload, check the console for
   `fcb-npc-trackers |` logs. API in the console, e.g.

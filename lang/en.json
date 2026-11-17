@@ -34,6 +34,7 @@
     },
     "Card": {
       "edit": "Edit tracker",
+      "export": "Transfer the history of all trackers of this NPC to the Campaign Builder (overwrites the field chosen in the module settings)",
       "setAside": "Set aside",
       "activate": "Show in panel",
       "remove": "Remove tracker",
@@ -73,6 +74,15 @@
       "npcNamePlaceholder": "Own name, e.g. Gulfport Authorities",
       "pcNamePlaceholder": "Own name, e.g. Party"
     },
+    "Export": {
+      "done": "History of {npc} ({trackers} trackers) written to the field “{field}”.",
+      "noField": "No Campaign Builder field is chosen for the history. Choose one in the module settings (“Field for the history”).",
+      "fieldMissing": "The Campaign Builder field “{field}” chosen for the history no longer exists or is no editor field. Choose another one in the module settings.",
+      "manualNpc": "This NPC is only a name, not a Campaign Builder entry, so there is no field to write to.",
+      "npcMissing": "The NPC's Campaign Builder entry no longer exists.",
+      "footer": "Transferred from the NPC trackers on {date}. This field is overwritten on every transfer.",
+      "noPc": "Without player character"
+    },
     "Settings": {
       "logTime": {
         "name": "Time in the change log",
@@ -80,6 +90,12 @@
         "both": "In-world time and real time",
         "world": "In-world time (real time as tooltip)",
         "real": "Real time only"
+      },
+      "exportField": {
+        "name": "Field for the history",
+        "hint": "Campaign Builder character field (editor type only) that receives the tracker history of an NPC. Every transfer overwrites the whole field, so use a field of its own.",
+        "none": "— none —",
+        "missing": "{field} (no longer exists)"
       }
     }
   }

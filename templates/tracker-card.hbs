@@ -12,6 +12,10 @@
     <div class="fcb-npc-trackers-card__actions">
       <button type="button" class="icon fa-solid fa-pen" data-action="editTracker" data-tracker-id="{{id}}"
               data-tooltip="FCB_NPC_TRACKERS.Card.edit" aria-label="{{localize 'FCB_NPC_TRACKERS.Card.edit'}}"></button>
+      {{#if canExport}}
+        <button type="button" class="icon fa-solid fa-file-export" data-action="exportHistory" data-tracker-id="{{id}}"
+                data-tooltip="FCB_NPC_TRACKERS.Card.export" aria-label="{{localize 'FCB_NPC_TRACKERS.Card.export'}}"></button>
+      {{/if}}
       {{#if active}}
         <button type="button" class="icon fa-solid fa-box-archive" data-action="toggleActive" data-tracker-id="{{id}}" data-active="false"
                 data-tooltip="FCB_NPC_TRACKERS.Card.setAside" aria-label="{{localize 'FCB_NPC_TRACKERS.Card.setAside'}}"></button>

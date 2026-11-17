@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **Transfer the history to the Campaign Builder**: a new button on each tracker card writes the history of all trackers of that NPC (one section per player character with current values and every change, oldest first, including notes) into an editor field of the NPC's Campaign Builder entry. New world setting "Field for the history" lists the Campaign Builder's current character fields of type *Editor*. The field is overwritten on every transfer. A clear error is shown when no field is chosen, the chosen field was deleted (or is no editor field any more), the NPC is only a name, or its entry no longer exists. API: `exportHistory(npcUuid)`.
 - **In-world time in the log**: every change stores the world's game time (`game.time.worldTime`) next to the real time and shows it as a date of the world calendar (month names of the system or calendar module). New world setting "Time in the change log": in-world and real time (default), in-world time with real time as tooltip, or real time only. Entries made before this version keep showing the real time.
 - **Delete log entries**: each log entry has a trash icon next to its heading; after confirmation the entry (and its note) is removed. Current bar values do not change. API: `removeLogEntry(trackerId, logId)`.
 - Create/edit dialog is wider and puts the "own name" field on its own line so the selects stay readable.

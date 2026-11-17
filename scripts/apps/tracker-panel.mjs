@@ -8,7 +8,8 @@ import { Logger } from "../logger.mjs";
 import { CampaignBuilderBridge } from "../integration/campaign-builder-bridge.mjs";
 import { TrackerMath } from "../tracker/tracker-math.mjs";
 import { TrackerStore } from "../tracker/tracker-store.mjs";
-import { WorldTime } from "../tracker/world-time.mjs";
+import { LogTimeFormat } from "../tracker/log-time-format.mjs";
+import { HistoryExport } from "../tracker/history-export.mjs";
 import { ModuleSettings } from "../settings.mjs";
 import { TrackerForm } from "./tracker-form.mjs";
 
@@ -58,7 +59,8 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
       removeLogEntry: TrackerPanel.#onRemoveLogEntry,
       undoRemove: TrackerPanel.#onUndoRemove,
       addTracker: TrackerPanel.#onAddTracker,
-      editTracker: TrackerPanel.#onEditTracker
+      editTracker: TrackerPanel.#onEditTracker,
+      exportHistory: TrackerPanel.#onExportHistory
     }
   };
 
@@ -227,6 +229,7 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
       active: tracker.active,
       npcName: this.#who(tracker.npcUuid, tracker.npcName, "missingNpc"),
       npcMissing: Boolean(tracker.npcUuid) && this.#names.get(tracker.npcUuid) == null,
+      canExport: Boolean(tracker.npcUuid),
       hasPc: Boolean(tracker.pcUuid || tracker.pcName),
       pcName: this.#who(tracker.pcUuid, tracker.pcName, "missingPc"),
       pcMissing: Boolean(tracker.pcUuid) && this.#names.get(tracker.pcUuid) == null,
@@ -263,46 +266,9 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
           icon: entry.to > entry.from ? "fa-arrow-up" : "fa-arrow-down",
           color: colors.get(entry.barId) ?? FALLBACK_COLOR,
           note: entry.note,
-          ...TrackerPanel.#logTime(entry, mode, dateFormat)
+          ...LogTimeFormat.entry(entry, mode, dateFormat)
         }))
     };
-  }
-
-  /**
-   * Texts for the time of a log entry according to the LOG_TIME setting.
-   * @param {import("../tracker/tracker-math.mjs").LogEntry} entry
-   * @param {string} mode                   One of LOG_TIME_MODES.
-   * @param {Intl.DateTimeFormat} dateFormat Formatter for the real time.
-   * @returns {{time: string, timeSecondary: string, timeTooltip: string}}
-   */
-  static #logTime(entry, mode, dateFormat) {
-    const real = dateFormat.format(entry.at);
-    const world = Number.isInteger(entry.worldTime) ? TrackerPanel.#formatWorldTime(entry.worldTime) : null;
-    const display = WorldTime.display(mode, world !== null);
-    const text = kind => (kind === "world" ? world : kind === "real" ? real : "");
-    return { time: text(display.primary), timeSecondary: text(display.secondary), timeTooltip: text(display.tooltip) };
-  }
-
-  /**
-   * Format an in-world time with the world's calendar (`game.time.calendar`).
-   * @param {number} seconds  A stored `worldTime`.
-   * @returns {string|null}   The formatted date, or null when the calendar cannot handle it.
-   */
-  static #formatWorldTime(seconds) {
-    try {
-      const calendar = game.time.calendar;
-      const parts = WorldTime.parts(calendar.timeToComponents(seconds), calendar);
-      const key = parts.month === null ? "worldDateNoMonth" : "worldDate";
-      return game.i18n.format(`${I18N_PREFIX}.Card.${key}`, {
-        day: parts.day,
-        month: parts.month === null ? "" : game.i18n.localize(parts.month),
-        year: parts.year,
-        time: parts.time
-      });
-    } catch (err) {
-      Logger.warn("Cannot format world time", seconds, err);
-      return null;
-    }
   }
 
   /**
@@ -403,6 +369,24 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   static #onEditTracker(_event, target) {
     return TrackerPanel.#run(TrackerForm.open({ trackerId: target.dataset.trackerId }));
+  }
+
+  /**
+   * Write the history of all trackers of the card's NPC into the configured Campaign Builder field.
+   * @this {TrackerPanel}
+   * @param {PointerEvent} _event
+   * @param {HTMLButtonElement} target  Button with `data-tracker-id`.
+   */
+  static async #onExportHistory(_event, target) {
+    const tracker = TrackerStore.get(target.dataset.trackerId);
+    if (!tracker) return;
+    target.disabled = true;
+    try {
+      const result = await TrackerPanel.#run(HistoryExport.exportNpc(tracker.npcUuid));
+      if (result) ui.notifications.info(game.i18n.format(`${I18N_PREFIX}.Export.done`, result));
+    } finally {
+      target.disabled = false;
+    }
   }
 
   /**

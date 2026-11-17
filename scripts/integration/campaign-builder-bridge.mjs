@@ -8,9 +8,13 @@
  *
  * Re-check against the Campaign Builder's `src/classes/Documents/FCBSetting.ts` (`createCompendium`),
  * `src/documents/indices.ts` and `src/documents/entry.ts` with every Campaign Builder release.
+ * The custom field definitions come from the Campaign Builder's world setting `customFields`
+ * (`{[CustomFieldContentType]: {name, label, fieldType, sortOrder, deleted}[]}`); their values
+ * live in the entry page's `system.customFields[name]`.
  * @module integration/campaign-builder-bridge
  */
 import { UPSTREAM } from "../constants.mjs";
+import { HistoryHtml } from "../tracker/history-html.mjs";
 
 /** Index fields needed to recognize an entry and its topic (same ones the Campaign Builder indexes). */
 const INDEX_FIELDS = [
@@ -79,6 +83,36 @@ export class CampaignBuilderBridge {
    */
   static playerName(entry) {
     return entry?.pages?.contents?.[0]?.system?.playerName ?? "";
+  }
+
+  /**
+   * Editor fields (the only ones that keep formatting) currently defined for characters (NPCs),
+   * without deleted ones. Empty when the Campaign Builder or its setting is not available.
+   * @returns {import("../tracker/history-html.mjs").FieldChoice[]}
+   */
+  static characterEditorFields() {
+    let definitions;
+    try {
+      definitions = game.settings.get(UPSTREAM.CAMPAIGN_BUILDER_ID, UPSTREAM.CUSTOM_FIELDS_SETTING);
+    } catch {
+      return [];
+    }
+    return HistoryHtml.editorFields(definitions?.[UPSTREAM.CONTENT_TYPE_CHARACTER], UPSTREAM.FIELD_TYPE_EDITOR);
+  }
+
+  /**
+   * Replace the content of a custom field on an entry. Only the field's value is written: the
+   * Campaign Builder's own search index picks it up the next time it rebuilds or saves the entry.
+   * @param {JournalEntry} entry  A resolved Campaign Builder entry.
+   * @param {string} fieldName    Key in `system.customFields`.
+   * @param {string} html
+   * @returns {Promise<void>}
+   * @throws {Error} When the entry has no entry page or the update fails (e.g. a locked compendium).
+   */
+  static async setCustomField(entry, fieldName, html) {
+    const page = entry?.pages?.contents?.[0];
+    if (page?.type !== UPSTREAM.ENTRY_TYPE) throw new Error(`"${entry?.name}" is not a Campaign Builder entry.`);
+    await page.update({ [`system.customFields.${fieldName}`]: html });
   }
 
   /**

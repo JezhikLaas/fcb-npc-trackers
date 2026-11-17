@@ -23,7 +23,13 @@ export const UPSTREAM = Object.freeze({
   /** Value of that flag for NPC/PC/location/organization entries. */
   ENTRY_TYPE: "campaign-builder.entry2",
   /** Fallback values of the Campaign Builder `Topics` enum (the live ones come from `api.TOPICS`). */
-  TOPIC_FALLBACK: Object.freeze({ CHARACTER: 1, PC: 4 })
+  TOPIC_FALLBACK: Object.freeze({ CHARACTER: 1, PC: 4 }),
+  /** World setting (below the Campaign Builder's id) holding the custom field definitions per content type. */
+  CUSTOM_FIELDS_SETTING: "customFields",
+  /** `CustomFieldContentType.Character`: key of the NPC field definitions in that setting. */
+  CONTENT_TYPE_CHARACTER: 1,
+  /** `FieldType.Editor`: rich text field, the only type that keeps formatting. */
+  FIELD_TYPE_EDITOR: 2
 });
 
 /** Hard limits of the data model. */
@@ -47,7 +53,9 @@ export const SETTINGS = Object.freeze({
   /** Client setting remembering the last choices of the create dialog. */
   LAST_CREATE: "lastCreate",
   /** World setting: which time log entries show (see LOG_TIME_MODES). */
-  LOG_TIME: "logTime"
+  LOG_TIME: "logTime",
+  /** World setting: name of the Campaign Builder character field the history is exported to. */
+  EXPORT_FIELD: "exportField"
 });
 
 /** Values of the LOG_TIME setting. */

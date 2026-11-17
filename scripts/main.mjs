@@ -12,6 +12,7 @@ import { TrackerPanel } from "./apps/tracker-panel.mjs";
 import { TrackerMath } from "./tracker/tracker-math.mjs";
 import { TrackerStore } from "./tracker/tracker-store.mjs";
 import { TrackerTemplates } from "./tracker/tracker-templates.mjs";
+import { HistoryExport } from "./tracker/history-export.mjs";
 
 /**
  * Public API, exposed as `game.modules.get("fcb-npc-trackers").api`.
@@ -146,6 +147,16 @@ class TrackerApi {
   }
 
   /**
+   * Write the history of all trackers of an NPC into the Campaign Builder field chosen in the
+   * module settings (overwrites the field).
+   * @param {string} npcUuid  UUID of the NPC's Campaign Builder entry.
+   * @returns {Promise<import("./tracker/history-export.mjs").ExportResult>}
+   */
+  exportHistory(npcUuid) {
+    return HistoryExport.exportNpc(npcUuid);
+  }
+
+  /**
    * Trackers whose NPC or PC no longer exists in the Campaign Builder.
    * @returns {Promise<Map<string, {npcMissing: boolean, pcMissing: boolean}>>}
    */
@@ -163,6 +174,7 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", () => {
   if (!game.user.isGM) return;
+  ModuleSettings.refreshExportFieldChoices();
   if (!CampaignBuilderBridge.isActive) {
     Logger.warn(`Inactive: requires the "${UPSTREAM.CAMPAIGN_BUILDER_ID}" module.`);
     return;

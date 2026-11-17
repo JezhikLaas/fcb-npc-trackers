@@ -2,10 +2,18 @@
  * Registration of and typed access to this module's settings.
  * @module settings
  */
-import { DEFAULT_TEMPLATE_ID, HOOKS, I18N_PREFIX, LOG_TIME_MODES, MODULE_ID, SETTINGS } from "./constants.mjs";
+import { DEFAULT_TEMPLATE_ID, HOOKS, I18N_PREFIX, LOG_TIME_MODES, MODULE_ID, SETTINGS, UPSTREAM } from "./constants.mjs";
+import { CampaignBuilderBridge } from "./integration/campaign-builder-bridge.mjs";
 import { TemplateCollection, TrackerCollection } from "./tracker/tracker-data.mjs";
 
 export class ModuleSettings {
+  /**
+   * Choices of the EXPORT_FIELD dropdown. The settings dialog reads this object on every render,
+   * so it is refilled in place whenever the Campaign Builder's field definitions change.
+   * @type {Record<string, string>}
+   */
+  static #exportFieldChoices = {};
+
   /**
    * Register all settings. Call during the `init` hook.
    */
@@ -52,6 +60,48 @@ export class ModuleSettings {
       default: LOG_TIME_MODES.BOTH,
       onChange: () => Hooks.callAll(HOOKS.TRACKERS_UPDATED)
     });
+
+    // Plain String with a choices object (not a StringField): the stored name must survive when
+    // the field is deleted in the Campaign Builder, so the export can report exactly that.
+    game.settings.register(MODULE_ID, SETTINGS.EXPORT_FIELD, {
+      name: `${I18N_PREFIX}.Settings.exportField.name`,
+      hint: `${I18N_PREFIX}.Settings.exportField.hint`,
+      scope: "world",
+      config: true,
+      restricted: true,
+      type: String,
+      choices: ModuleSettings.#exportFieldChoices,
+      default: "",
+      onChange: () => ModuleSettings.refreshExportFieldChoices()
+    });
+
+    Hooks.on("updateSetting", setting => {
+      if (setting.key === `${UPSTREAM.CAMPAIGN_BUILDER_ID}.${UPSTREAM.CUSTOM_FIELDS_SETTING}`) {
+        ModuleSettings.refreshExportFieldChoices();
+      }
+    });
+  }
+
+  /**
+   * Refill the EXPORT_FIELD dropdown from the Campaign Builder's current character editor fields.
+   * A stored field that no longer exists stays selectable, marked as missing. Call from `ready`.
+   */
+  static refreshExportFieldChoices() {
+    const choices = ModuleSettings.#exportFieldChoices;
+    for (const key of Object.keys(choices)) delete choices[key];
+    choices[""] = game.i18n.localize(`${I18N_PREFIX}.Settings.exportField.none`);
+    for (const field of CampaignBuilderBridge.characterEditorFields()) {
+      choices[field.name] = game.i18n.localize(field.label);
+    }
+    const current = ModuleSettings.exportField;
+    if (current && !(current in choices)) {
+      choices[current] = game.i18n.format(`${I18N_PREFIX}.Settings.exportField.missing`, { field: current });
+    }
+  }
+
+  /** @returns {string} Name of the Campaign Builder character field the history is exported to; empty when not set. */
+  static get exportField() {
+    return game.settings.get(MODULE_ID, SETTINGS.EXPORT_FIELD) ?? "";
   }
 
   /** @returns {string} Which time log entries show, one of LOG_TIME_MODES. */
