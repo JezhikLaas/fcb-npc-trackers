@@ -98,6 +98,12 @@
         "hint": "Campaign-Builder-Feld für Charaktere (nur Typ Editor), in das der Tracker-Verlauf eines NSC geschrieben wird. Jede Übergabe überschreibt das ganze Feld, nutze also ein eigenes Feld dafür.",
         "none": "— keines —",
         "missing": "{field} (existiert nicht mehr)"
+      },
+      "exportOrder": {
+        "name": "Reihenfolge des übertragenen Verlaufs",
+        "hint": "Reihenfolge der Änderungen, die in das Campaign-Builder-Feld geschrieben werden.",
+        "oldestFirst": "Älteste zuerst",
+        "newestFirst": "Neueste zuerst"
       }
     }
   }

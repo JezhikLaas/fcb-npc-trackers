@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **Order of the transferred history**: new world setting chooses whether the history export lists changes oldest first (default, as before) or newest first.
 - **Collapsible cards**: a chevron in the card header collapses a tracker to its "NPC ↔ PC" line and expands it again. The state is remembered per client (client setting `collapsed`).
 - **Reorder by drag & drop**: drag a card by its header onto another card (upper or lower half) to move it before or after it; the order is saved right away and also used by the history export. Cards move within their section (shown or set aside). API: `moveTracker(trackerId, targetId, after)`.
 - **Transfer the history to the Campaign Builder**: a new button on each tracker card writes the history of all trackers of that NPC (one section per player character with current values and every change, oldest first, including notes) into an editor field of the NPC's Campaign Builder entry. New world setting "Field for the history" lists the Campaign Builder's current character fields of type *Editor*. The field is overwritten on every transfer. A clear error is shown when no field is chosen, the chosen field was deleted (or is no editor field any more), the NPC is only a name, or its entry no longer exists. API: `exportHistory(npcUuid)`.

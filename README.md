@@ -60,8 +60,8 @@ The history can be written into a custom field of the NPC's Campaign Builder ent
 2. In this module's settings, choose that field under **Field for the history**.
 3. Click the export button on a tracker card.
 
-The field receives one section per player character with the current values and every change (oldest first,
-with time and note). It is **overwritten on every transfer** with the history of all trackers of that NPC, so use
+The field receives one section per player character with the current values and every change (oldest or
+newest first, see **Order of the transferred history**, with time and note). It is **overwritten on every transfer** with the history of all trackers of that NPC, so use
 a field of its own. An error is shown when no field is chosen, the chosen field was deleted in the Campaign Builder
 (or is no editor field any more), the NPC is only a free-text name, or its entry no longer exists.
 
@@ -69,6 +69,7 @@ a field of its own. An error is shown when no field is chosen, the chosen field 
 
 - **Time in the change log** – in-world and real time (default), in-world time with the real time as tooltip, or real time only.
 - **Field for the history** – the Campaign Builder character field (type *Editor*) the export writes to.
+- **Order of the transferred history** – changes oldest first (default) or newest first in the exported field.
 
 ## Macro API
 

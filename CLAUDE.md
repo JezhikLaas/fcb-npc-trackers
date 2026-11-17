@@ -188,7 +188,8 @@ Re-check with every CB release (repo `dovrosenberg/fvtt-campaign-builder`):
   module; agreed with the maintainer). Only editor fields (formatting) of characters, not deleted, are offered.
   The setting is a plain `String` with a choices object refilled in place (`ModuleSettings.refreshExportFieldChoices`,
   on `ready` and on `updateSetting` of the CB's `customFields`), so a deleted field stays stored and the export can
-  report it. Errors (no field, field missing, manual NPC, entry missing) are thrown as localized `Error`s. This is the
+  report it. The world setting `exportOrder` (`EXPORT_ORDERS`: `oldestFirst` default, `newestFirst`) sets the
+  order of the log entries (pure `HistoryHtml.order`; the stored log stays oldest first). Errors (no field, field missing, manual NPC, entry missing) are thrown as localized `Error`s. This is the
   only place where we write to a CB document, and only `system.customFields.<name>`; the CB's search index catches up
   on its own next rebuild/save.
 

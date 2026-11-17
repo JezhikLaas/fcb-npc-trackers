@@ -56,6 +56,8 @@ export const SETTINGS = Object.freeze({
   LOG_TIME: "logTime",
   /** World setting: name of the Campaign Builder character field the history is exported to. */
   EXPORT_FIELD: "exportField",
+  /** World setting: order of the log entries in the history export (see EXPORT_ORDERS). */
+  EXPORT_ORDER: "exportOrder",
   /** Client setting: ids of the trackers collapsed in the panel. */
   COLLAPSED: "collapsed"
 });
@@ -68,6 +70,14 @@ export const LOG_TIME_MODES = Object.freeze({
   REAL: "real",
   /** In-world time with the real time below it. */
   BOTH: "both"
+});
+
+/** Values of the EXPORT_ORDER setting. */
+export const EXPORT_ORDERS = Object.freeze({
+  /** Oldest change first (the order of the stored log). */
+  OLDEST_FIRST: "oldestFirst",
+  /** Newest change first. */
+  NEWEST_FIRST: "newestFirst"
 });
 
 /** Keys of this module's keybindings. */

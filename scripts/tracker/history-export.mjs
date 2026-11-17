@@ -52,7 +52,7 @@ export class HistoryExport {
   }
 
   /**
-   * Localized export data of one tracker. Log entries come oldest first.
+   * Localized export data of one tracker. Log entries come in the order of the EXPORT_ORDER setting.
    * @param {import("./tracker-math.mjs").Tracker} tracker
    * @returns {Promise<import("./history-html.mjs").HistorySection>}
    */
@@ -69,7 +69,7 @@ export class HistoryExport {
     return {
       title,
       bars: tracker.bars.map(bar => ({ label: t(bar.label), value: bar.value, steps: bar.steps })),
-      entries: tracker.log.map(entry => ({
+      entries: HistoryHtml.order(tracker.log, ModuleSettings.exportOrder).map(entry => ({
         time: LogTimeFormat.entry(entry, mode, dateFormat).time,
         label: t(entry.label),
         from: entry.from,

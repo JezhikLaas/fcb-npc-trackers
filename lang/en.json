@@ -98,6 +98,12 @@
         "hint": "Campaign Builder character field (editor type only) that receives the tracker history of an NPC. Every transfer overwrites the whole field, so use a field of its own.",
         "none": "— none —",
         "missing": "{field} (no longer exists)"
+      },
+      "exportOrder": {
+        "name": "Order of the transferred history",
+        "hint": "Order of the changes written into the Campaign Builder field.",
+        "oldestFirst": "Oldest first",
+        "newestFirst": "Newest first"
       }
     }
   }

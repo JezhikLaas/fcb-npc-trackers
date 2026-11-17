@@ -2,7 +2,7 @@
  * Registration of and typed access to this module's settings.
  * @module settings
  */
-import { DEFAULT_TEMPLATE_ID, HOOKS, I18N_PREFIX, LOG_TIME_MODES, MODULE_ID, SETTINGS, UPSTREAM } from "./constants.mjs";
+import { DEFAULT_TEMPLATE_ID, EXPORT_ORDERS, HOOKS, I18N_PREFIX, LOG_TIME_MODES, MODULE_ID, SETTINGS, UPSTREAM } from "./constants.mjs";
 import { CampaignBuilderBridge } from "./integration/campaign-builder-bridge.mjs";
 import { TemplateCollection, TrackerCollection } from "./tracker/tracker-data.mjs";
 
@@ -75,6 +75,24 @@ export class ModuleSettings {
       onChange: () => ModuleSettings.refreshExportFieldChoices()
     });
 
+    game.settings.register(MODULE_ID, SETTINGS.EXPORT_ORDER, {
+      name: `${I18N_PREFIX}.Settings.exportOrder.name`,
+      hint: `${I18N_PREFIX}.Settings.exportOrder.hint`,
+      scope: "world",
+      config: true,
+      restricted: true,
+      type: new foundry.data.fields.StringField({
+        required: true,
+        blank: false,
+        initial: EXPORT_ORDERS.OLDEST_FIRST,
+        choices: {
+          [EXPORT_ORDERS.OLDEST_FIRST]: `${I18N_PREFIX}.Settings.exportOrder.oldestFirst`,
+          [EXPORT_ORDERS.NEWEST_FIRST]: `${I18N_PREFIX}.Settings.exportOrder.newestFirst`
+        }
+      }),
+      default: EXPORT_ORDERS.OLDEST_FIRST
+    });
+
     game.settings.register(MODULE_ID, SETTINGS.COLLAPSED, {
       scope: "client",
       config: false,
@@ -124,6 +142,11 @@ export class ModuleSettings {
   /** @returns {string} Name of the Campaign Builder character field the history is exported to; empty when not set. */
   static get exportField() {
     return game.settings.get(MODULE_ID, SETTINGS.EXPORT_FIELD) ?? "";
+  }
+
+  /** @returns {string} Order of the log entries in the history export, one of EXPORT_ORDERS. */
+  static get exportOrder() {
+    return game.settings.get(MODULE_ID, SETTINGS.EXPORT_ORDER);
   }
 
   /** @returns {string} Which time log entries show, one of LOG_TIME_MODES. */

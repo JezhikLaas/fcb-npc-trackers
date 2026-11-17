@@ -34,6 +34,22 @@ describe("HistoryHtml.escape", () => {
   });
 });
 
+describe("HistoryHtml.order", () => {
+  const log = [{ id: "a" }, { id: "b" }, { id: "c" }];
+
+  it("keeps the stored order for oldestFirst", () => {
+    assert.deepEqual(HistoryHtml.order(log, "oldestFirst").map(e => e.id), ["a", "b", "c"]);
+  });
+  it("reverses for newestFirst without mutating the input", () => {
+    assert.deepEqual(HistoryHtml.order(log, "newestFirst").map(e => e.id), ["c", "b", "a"]);
+    assert.deepEqual(log.map(e => e.id), ["a", "b", "c"]);
+  });
+  it("falls back to the stored order for unknown values and handles a missing log", () => {
+    assert.deepEqual(HistoryHtml.order(log, "bogus").map(e => e.id), ["a", "b", "c"]);
+    assert.deepEqual(HistoryHtml.order(undefined, "newestFirst"), []);
+  });
+});
+
 describe("HistoryHtml.build", () => {
   const texts = { noChanges: "No changes yet.", footer: "Transferred 17.11.2026" };
 

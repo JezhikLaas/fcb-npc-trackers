@@ -24,7 +24,7 @@
  * @typedef {object} HistorySection
  * @property {string} title                                         Heading, usually the PC name.
  * @property {{label: string, value: number, steps: number}[]} bars Current values.
- * @property {HistoryEntry[]} entries                               Log entries, oldest first.
+ * @property {HistoryEntry[]} entries                               Log entries in the order to render.
  */
 
 /**
@@ -47,6 +47,19 @@ export class HistoryHtml {
       .filter(d => d && typeof d.name === "string" && d.name && d.fieldType === editorType && !d.deleted)
       .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
       .map(d => ({ name: d.name, label: typeof d.label === "string" && d.label ? d.label : d.name }));
+  }
+
+  /**
+   * Log entries in the export order. The stored log is oldest first; any value other than
+   * `"newestFirst"` keeps that order.
+   * @template T
+   * @param {T[]} entries  Log entries, oldest first.
+   * @param {string} order One of EXPORT_ORDERS (`"oldestFirst"`, `"newestFirst"`).
+   * @returns {T[]} A new array.
+   */
+  static order(entries, order) {
+    const list = Array.isArray(entries) ? entries.slice() : [];
+    return order === "newestFirst" ? list.reverse() : list;
   }
 
   /**
