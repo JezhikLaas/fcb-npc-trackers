@@ -20,8 +20,9 @@ import { TrackerStore } from "./tracker-store.mjs";
 
 export class HistoryExport {
   /**
-   * Write the history of all trackers of one NPC into the configured field (GM only).
-   * @param {string} npcUuid  UUID of the NPC's Campaign Builder entry.
+   * Write the history of all trackers of one NPC into the configured field (GM only). An
+   * organization entry uses the organization field setting, a character the character one.
+   * @param {string} npcUuid  UUID of the NPC's (character or organization) Campaign Builder entry.
    * @returns {Promise<ExportResult>}
    * @throws {Error} With a localized message when no field is configured, the field no longer
    *   exists (or is no editor field), the NPC is a manual name or its entry no longer exists.
@@ -30,14 +31,22 @@ export class HistoryExport {
     const error = (key, data = {}) => new Error(game.i18n.format(`${I18N_PREFIX}.Export.${key}`, data));
     if (!game.user.isGM) throw new Error(game.i18n.localize(`${I18N_PREFIX}.Errors.gmOnly`));
 
-    const fieldName = ModuleSettings.exportField;
-    if (!fieldName) throw error("noField");
-    const field = CampaignBuilderBridge.characterEditorFields().find(f => f.name === fieldName);
-    if (!field) throw error("fieldMissing", { field: fieldName });
-
     if (!npcUuid) throw error("manualNpc");
     const entry = await CampaignBuilderBridge.resolve(npcUuid);
     if (!entry) throw error("npcMissing");
+
+    // Characters and organizations have separate field definitions, hence separate settings.
+    const organization = CampaignBuilderBridge.isOrganization(entry);
+    const setting = game.i18n.localize(
+      `${I18N_PREFIX}.Settings.${organization ? "exportFieldOrganization" : "exportField"}.name`
+    );
+    const fieldName = organization ? ModuleSettings.exportFieldOrganization : ModuleSettings.exportField;
+    if (!fieldName) throw error("noField", { setting });
+    const fields = organization
+      ? CampaignBuilderBridge.organizationEditorFields()
+      : CampaignBuilderBridge.characterEditorFields();
+    const field = fields.find(f => f.name === fieldName);
+    if (!field) throw error("fieldMissing", { field: fieldName, setting });
 
     const trackers = TrackerStore.list({ npcUuid });
     const sections = await Promise.all(trackers.map(t => HistoryExport.#section(t)));

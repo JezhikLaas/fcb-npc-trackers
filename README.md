@@ -28,7 +28,7 @@ This module has been developed with the help of Claude Code.
 ## Using it
 
 Open the **tracker panel** with `Shift+Alt+N` (rebindable in the controls settings) or with the
-button in the scene controls. Choose **New tracker**, pick the NPC and the player character,
+button in the scene controls. Choose **New tracker**, pick the NPC (or an organization) and the player character,
 adjust the bars if you like, and save. Click a box to set a value; click the topmost filled box to step back.
 Type a note into any log entry. The trash button removes a tracker immediately; **Undo** appears for a few seconds.
 
@@ -44,6 +44,8 @@ Campaign Builder entry (see *Transfer to the Campaign Builder* below).
 - **Log with notes** – every change is recorded; add a note to any change, before or after. Single log entries can be deleted.
 - **In-world time** – log entries show the date and time of the world calendar, the real time, or both.
 - **One tracker per NPC × PC pair** – Aurelia can feel differently about every character.
+- **Organizations too** – Campaign Builder organizations can take the NPC's place (marked "(Organization)" in the
+  list and with an icon on the card); everything else, including the transfer, works the same.
 - **Prepare and keep** – trackers persist until you remove them. Set one aside to hide it from the session panel without deleting it.
 - **Remove in one click** – with a few seconds to undo.
 - **Collapsible cards** – a collapsed card shows only "NPC ↔ PC"; the panel remembers the state per card.
@@ -57,7 +59,10 @@ The history can be written into a custom field of the NPC's Campaign Builder ent
 
 1. In the Campaign Builder settings, add a custom field of type **Editor** for characters, e.g. *Relationships*.
    Only editor fields keep the formatting, so other field types are not offered.
-2. In this module's settings, choose that field under **Field for the history**.
+   For organizations, add such a field for organizations as well (the Campaign Builder keeps the fields
+   of characters and organizations apart).
+2. In this module's settings, choose that field under **Field for the history** (and the organization field under
+   **Field for the history (organizations)**).
 3. Click the export button on a tracker card.
 
 The field receives one section per player character with the current values and every change (oldest or
@@ -69,6 +74,7 @@ a field of its own. An error is shown when no field is chosen, the chosen field 
 
 - **Time in the change log** – in-world and real time (default), in-world time with the real time as tooltip, or real time only.
 - **Field for the history** – the Campaign Builder character field (type *Editor*) the export writes to.
+- **Field for the history (organizations)** – the same for organizations.
 - **Order of the transferred history** – changes oldest first (default) or newest first in the exported field.
 
 ## Macro API
@@ -96,7 +102,7 @@ await api.moveTracker(trackerA.id, trackerB.id, false);
 
 ## Notes
 
-- An NPC or PC is either a Campaign Builder entry (`npcUuid` / `pcUuid`) or a free-text name (`npcName` / `pcName`, e.g. an organisation or the whole party). A uuid always wins over a name; trackers with a manual NPC get their own entry in the panel's NPC filter.
+- An NPC or PC is either a Campaign Builder entry (`npcUuid` / `pcUuid`) or a free-text name (`npcName` / `pcName`, e.g. the whole party). On the NPC side the entry may be a character or an organization. A uuid always wins over a name; trackers with a manual NPC get their own entry in the panel's NPC filter.
 - Tracker data is stored in a world setting (the Campaign Builder keeps its entries in compendium packs).
   Like every world setting it is technically readable by all connected clients; the module's interface is GM only.
 - A Campaign Builder setting export does not include the trackers (the transferred history in an entry field does).

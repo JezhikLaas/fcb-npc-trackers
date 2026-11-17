@@ -53,7 +53,7 @@
     "Form": {
       "titleCreate": "Neuer Tracker",
       "titleEdit": "Tracker bearbeiten",
-      "npc": "NSC",
+      "npc": "NSC / Organisation",
       "pc": "Spielercharakter",
       "noPc": "— keiner —",
       "search": "Suchen…",
@@ -68,18 +68,19 @@
       "newBar": "Neuer Balken",
       "save": "Speichern",
       "cancel": "Abbrechen",
-      "noEntries": "Keine NSCs in den Kompendien des Campaign Builders („FCB - …“) gefunden. Du kannst trotzdem einen eigenen Namen eingeben oder nach dem Anlegen von NSCs „Liste aktualisieren“ drücken.",
+      "noEntries": "Keine NSCs oder Organisationen in den Kompendien des Campaign Builders („FCB - …“) gefunden. Du kannst trotzdem einen eigenen Namen eingeben oder nach dem Anlegen von NSCs bzw. Organisationen „Liste aktualisieren“ drücken.",
       "needNpc": "Bitte einen NSC wählen oder einen Namen eingeben.",
       "needBarLabel": "Jeder Balken braucht einen Namen.",
       "refresh": "Liste aktualisieren",
       "customName": "— eigener Name —",
       "npcNamePlaceholder": "Eigener Name, z. B. Gulfport Behörden",
-      "pcNamePlaceholder": "Eigener Name, z. B. Heldengruppe"
+      "pcNamePlaceholder": "Eigener Name, z. B. Heldengruppe",
+      "organization": "Organisation"
     },
     "Export": {
       "done": "Verlauf von {npc} ({trackers} Tracker) in das Feld „{field}“ geschrieben.",
-      "noField": "Für den Verlauf ist kein Campaign-Builder-Feld gewählt. Wähle eines in den Moduleinstellungen („Feld für den Verlauf“).",
-      "fieldMissing": "Das für den Verlauf gewählte Campaign-Builder-Feld „{field}“ existiert nicht mehr oder ist kein Editor-Feld. Wähle in den Moduleinstellungen ein anderes.",
+      "noField": "Für den Verlauf ist kein Campaign-Builder-Feld gewählt. Wähle eines in den Moduleinstellungen („{setting}“).",
+      "fieldMissing": "Das für den Verlauf gewählte Campaign-Builder-Feld „{field}“ existiert nicht mehr oder ist kein Editor-Feld. Wähle in den Moduleinstellungen ein anderes („{setting}“).",
       "manualNpc": "Dieser NSC ist nur ein Name und kein Campaign-Builder-Eintrag, daher gibt es kein Feld zum Beschreiben.",
       "npcMissing": "Der Campaign-Builder-Eintrag des NSC existiert nicht mehr.",
       "footer": "Aus den NSC-Trackern übertragen am {date}. Dieses Feld wird bei jeder Übergabe überschrieben.",
@@ -98,6 +99,10 @@
         "hint": "Campaign-Builder-Feld für Charaktere (nur Typ Editor), in das der Tracker-Verlauf eines NSC geschrieben wird. Jede Übergabe überschreibt das ganze Feld, nutze also ein eigenes Feld dafür.",
         "none": "— keines —",
         "missing": "{field} (existiert nicht mehr)"
+      },
+      "exportFieldOrganization": {
+        "name": "Feld für den Verlauf (Organisationen)",
+        "hint": "Campaign-Builder-Feld für Organisationen (nur Typ Editor), in das der Tracker-Verlauf einer Organisation geschrieben wird. Jede Übergabe überschreibt das ganze Feld, nutze also ein eigenes Feld dafür."
       },
       "exportOrder": {
         "name": "Reihenfolge des übertragenen Verlaufs",

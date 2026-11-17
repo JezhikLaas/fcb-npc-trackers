@@ -10,6 +10,10 @@
                 data-tracker-id="{{id}}" aria-expanded="true"
                 data-tooltip="FCB_NPC_TRACKERS.Card.collapse" aria-label="{{localize 'FCB_NPC_TRACKERS.Card.collapse'}}"></button>
       {{/if}}
+      {{#if npcOrganization}}
+        <i class="fa-solid fa-people-group fcb-npc-trackers-card__org" data-tooltip="FCB_NPC_TRACKERS.Form.organization"
+           aria-label="{{localize 'FCB_NPC_TRACKERS.Form.organization'}}"></i>
+      {{/if}}
       <span class="fcb-npc-trackers-card__npc{{#if npcMissing}} is-missing{{/if}}">{{npcName}}</span>
       {{#if hasPc}}
         <i class="fa-solid fa-arrows-left-right" inert></i>

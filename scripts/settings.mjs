@@ -8,11 +8,12 @@ import { TemplateCollection, TrackerCollection } from "./tracker/tracker-data.mj
 
 export class ModuleSettings {
   /**
-   * Choices of the EXPORT_FIELD dropdown. The settings dialog reads this object on every render,
-   * so it is refilled in place whenever the Campaign Builder's field definitions change.
-   * @type {Record<string, string>}
+   * Choices of the EXPORT_FIELD (characters) and EXPORT_FIELD_ORGANIZATION dropdowns. The settings
+   * dialog reads these objects on every render, so they are refilled in place whenever the
+   * Campaign Builder's field definitions change.
+   * @type {{character: Record<string, string>, organization: Record<string, string>}}
    */
-  static #exportFieldChoices = {};
+  static #exportFieldChoices = { character: {}, organization: {} };
 
   /**
    * Register all settings. Call during the `init` hook.
@@ -63,17 +64,22 @@ export class ModuleSettings {
 
     // Plain String with a choices object (not a StringField): the stored name must survive when
     // the field is deleted in the Campaign Builder, so the export can report exactly that.
-    game.settings.register(MODULE_ID, SETTINGS.EXPORT_FIELD, {
-      name: `${I18N_PREFIX}.Settings.exportField.name`,
-      hint: `${I18N_PREFIX}.Settings.exportField.hint`,
-      scope: "world",
-      config: true,
-      restricted: true,
-      type: String,
-      choices: ModuleSettings.#exportFieldChoices,
-      default: "",
-      onChange: () => ModuleSettings.refreshExportFieldChoices()
-    });
+    for (const [key, i18n, choices] of [
+      [SETTINGS.EXPORT_FIELD, "exportField", ModuleSettings.#exportFieldChoices.character],
+      [SETTINGS.EXPORT_FIELD_ORGANIZATION, "exportFieldOrganization", ModuleSettings.#exportFieldChoices.organization]
+    ]) {
+      game.settings.register(MODULE_ID, key, {
+        name: `${I18N_PREFIX}.Settings.${i18n}.name`,
+        hint: `${I18N_PREFIX}.Settings.${i18n}.hint`,
+        scope: "world",
+        config: true,
+        restricted: true,
+        type: String,
+        choices,
+        default: "",
+        onChange: () => ModuleSettings.refreshExportFieldChoices()
+      });
+    }
 
     game.settings.register(MODULE_ID, SETTINGS.EXPORT_ORDER, {
       name: `${I18N_PREFIX}.Settings.exportOrder.name`,
@@ -108,17 +114,30 @@ export class ModuleSettings {
   }
 
   /**
-   * Refill the EXPORT_FIELD dropdown from the Campaign Builder's current character editor fields.
-   * A stored field that no longer exists stays selectable, marked as missing. Call from `ready`.
+   * Refill the export field dropdowns from the Campaign Builder's current character and
+   * organization editor fields. A stored field that no longer exists stays selectable, marked as
+   * missing. Call from `ready`.
    */
   static refreshExportFieldChoices() {
-    const choices = ModuleSettings.#exportFieldChoices;
+    const { character, organization } = ModuleSettings.#exportFieldChoices;
+    ModuleSettings.#fillChoices(character, CampaignBuilderBridge.characterEditorFields(), ModuleSettings.exportField);
+    ModuleSettings.#fillChoices(
+      organization,
+      CampaignBuilderBridge.organizationEditorFields(),
+      ModuleSettings.exportFieldOrganization
+    );
+  }
+
+  /**
+   * Refill one choices object in place.
+   * @param {Record<string, string>} choices
+   * @param {import("./tracker/history-html.mjs").FieldChoice[]} fields
+   * @param {string} current  The stored field name.
+   */
+  static #fillChoices(choices, fields, current) {
     for (const key of Object.keys(choices)) delete choices[key];
     choices[""] = game.i18n.localize(`${I18N_PREFIX}.Settings.exportField.none`);
-    for (const field of CampaignBuilderBridge.characterEditorFields()) {
-      choices[field.name] = game.i18n.localize(field.label);
-    }
-    const current = ModuleSettings.exportField;
+    for (const field of fields) choices[field.name] = game.i18n.localize(field.label);
     if (current && !(current in choices)) {
       choices[current] = game.i18n.format(`${I18N_PREFIX}.Settings.exportField.missing`, { field: current });
     }
@@ -142,6 +161,11 @@ export class ModuleSettings {
   /** @returns {string} Name of the Campaign Builder character field the history is exported to; empty when not set. */
   static get exportField() {
     return game.settings.get(MODULE_ID, SETTINGS.EXPORT_FIELD) ?? "";
+  }
+
+  /** @returns {string} Name of the Campaign Builder organization field the history is exported to; empty when not set. */
+  static get exportFieldOrganization() {
+    return game.settings.get(MODULE_ID, SETTINGS.EXPORT_FIELD_ORGANIZATION) ?? "";
   }
 
   /** @returns {string} Order of the log entries in the history export, one of EXPORT_ORDERS. */

@@ -23,11 +23,13 @@ export const UPSTREAM = Object.freeze({
   /** Value of that flag for NPC/PC/location/organization entries. */
   ENTRY_TYPE: "campaign-builder.entry2",
   /** Fallback values of the Campaign Builder `Topics` enum (the live ones come from `api.TOPICS`). */
-  TOPIC_FALLBACK: Object.freeze({ CHARACTER: 1, PC: 4 }),
+  TOPIC_FALLBACK: Object.freeze({ CHARACTER: 1, ORGANIZATION: 3, PC: 4 }),
   /** World setting (below the Campaign Builder's id) holding the custom field definitions per content type. */
   CUSTOM_FIELDS_SETTING: "customFields",
   /** `CustomFieldContentType.Character`: key of the NPC field definitions in that setting. */
   CONTENT_TYPE_CHARACTER: 1,
+  /** `CustomFieldContentType.Organization`: key of the organization field definitions in that setting. */
+  CONTENT_TYPE_ORGANIZATION: 3,
   /** `FieldType.Editor`: rich text field, the only type that keeps formatting. */
   FIELD_TYPE_EDITOR: 2
 });
@@ -56,6 +58,8 @@ export const SETTINGS = Object.freeze({
   LOG_TIME: "logTime",
   /** World setting: name of the Campaign Builder character field the history is exported to. */
   EXPORT_FIELD: "exportField",
+  /** World setting: name of the Campaign Builder organization field the history is exported to. */
+  EXPORT_FIELD_ORGANIZATION: "exportFieldOrganization",
   /** World setting: order of the log entries in the history export (see EXPORT_ORDERS). */
   EXPORT_ORDER: "exportOrder",
   /** Client setting: ids of the trackers collapsed in the panel. */

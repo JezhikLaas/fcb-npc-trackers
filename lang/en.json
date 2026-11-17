@@ -53,7 +53,7 @@
     "Form": {
       "titleCreate": "New tracker",
       "titleEdit": "Edit tracker",
-      "npc": "NPC",
+      "npc": "NPC / Organization",
       "pc": "Player character",
       "noPc": "— none —",
       "search": "Search…",
@@ -68,18 +68,19 @@
       "newBar": "New bar",
       "save": "Save",
       "cancel": "Cancel",
-      "noEntries": "No NPCs found in the Campaign Builder's compendiums (“FCB - …”). You can still type an own name, or press “Refresh list” after creating NPCs.",
+      "noEntries": "No NPCs or organizations found in the Campaign Builder's compendiums (“FCB - …”). You can still type an own name, or press “Refresh list” after creating NPCs or organizations.",
       "needNpc": "Please choose an NPC or enter a name.",
       "needBarLabel": "Every bar needs a name.",
       "refresh": "Refresh list",
       "customName": "— own name —",
       "npcNamePlaceholder": "Own name, e.g. Gulfport Authorities",
-      "pcNamePlaceholder": "Own name, e.g. Party"
+      "pcNamePlaceholder": "Own name, e.g. Party",
+      "organization": "Organization"
     },
     "Export": {
       "done": "History of {npc} ({trackers} trackers) written to the field “{field}”.",
-      "noField": "No Campaign Builder field is chosen for the history. Choose one in the module settings (“Field for the history”).",
-      "fieldMissing": "The Campaign Builder field “{field}” chosen for the history no longer exists or is no editor field. Choose another one in the module settings.",
+      "noField": "No Campaign Builder field is chosen for the history. Choose one in the module settings (“{setting}”).",
+      "fieldMissing": "The Campaign Builder field “{field}” chosen for the history no longer exists or is no editor field. Choose another one in the module settings (“{setting}”).",
       "manualNpc": "This NPC is only a name, not a Campaign Builder entry, so there is no field to write to.",
       "npcMissing": "The NPC's Campaign Builder entry no longer exists.",
       "footer": "Transferred from the NPC trackers on {date}. This field is overwritten on every transfer.",
@@ -98,6 +99,10 @@
         "hint": "Campaign Builder character field (editor type only) that receives the tracker history of an NPC. Every transfer overwrites the whole field, so use a field of its own.",
         "none": "— none —",
         "missing": "{field} (no longer exists)"
+      },
+      "exportFieldOrganization": {
+        "name": "Field for the history (organizations)",
+        "hint": "Campaign Builder organization field (editor type only) that receives the tracker history of an organization. Every transfer overwrites the whole field, so use a field of its own."
       },
       "exportOrder": {
         "name": "Order of the transferred history",

@@ -253,7 +253,16 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
         .filter(uuid => !this.#names.has(uuid))
         .map(async uuid => {
           const entry = await CampaignBuilderBridge.resolve(uuid);
-          this.#names.set(uuid, entry ? { name: entry.name, playerName: CampaignBuilderBridge.playerName(entry) } : null);
+          this.#names.set(
+            uuid,
+            entry
+              ? {
+                  name: entry.name,
+                  playerName: CampaignBuilderBridge.playerName(entry),
+                  organization: CampaignBuilderBridge.isOrganization(entry)
+                }
+              : null
+          );
         })
     );
   }
@@ -265,7 +274,11 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   #keyLabel(key) {
     const prefix = TrackerMath.NAME_KEY_PREFIX;
-    return key.startsWith(prefix) ? key.slice(prefix.length) : this.#displayName(key, "missingNpc");
+    if (key.startsWith(prefix)) return key.slice(prefix.length);
+    const name = this.#displayName(key, "missingNpc");
+    return this.#names.get(key)?.organization
+      ? `${name} (${game.i18n.localize(`${I18N_PREFIX}.Form.organization`)})`
+      : name;
   }
 
   /**
@@ -309,6 +322,7 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
       active: tracker.active,
       npcName: this.#who(tracker.npcUuid, tracker.npcName, "missingNpc"),
       npcMissing: Boolean(tracker.npcUuid) && this.#names.get(tracker.npcUuid) == null,
+      npcOrganization: Boolean(tracker.npcUuid) && this.#names.get(tracker.npcUuid)?.organization === true,
       canExport: Boolean(tracker.npcUuid),
       hasPc: Boolean(tracker.pcUuid || tracker.pcName),
       pcName: this.#who(tracker.pcUuid, tracker.pcName, "missingPc"),

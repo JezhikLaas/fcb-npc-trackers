@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **Organizations as NPCs**: Campaign Builder organizations can be chosen on the NPC side of a tracker. They are marked "(Organization)" in the create dialog and the panel filter and show an icon on the card. The history transfer works the same; since the Campaign Builder keeps custom fields of organizations apart from those of characters, a new world setting "Field for the history (organizations)" chooses the target field.
 - **Order of the transferred history**: new world setting chooses whether the history export lists changes oldest first (default, as before) or newest first.
 - **Collapsible cards**: a chevron in the card header collapses a tracker to its "NPC ↔ PC" line and expands it again. The state is remembered per client (client setting `collapsed`).
 - **Reorder by drag & drop**: drag a card by its header onto another card (upper or lower half) to move it before or after it; the order is saved right away and also used by the history export. Cards move within their section (shown or set aside). API: `moveTracker(trackerId, targetId, after)`.

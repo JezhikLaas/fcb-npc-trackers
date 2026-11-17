@@ -80,6 +80,9 @@ Requirements (agreed with the maintainer):
 ## NPC / PC identity
 
 An NPC or PC is a CB entry (`npcUuid`/`pcUuid`) or a manual name (`npcName`/`pcName`); a uuid always wins and clears the name. Never compare `npcUuid` directly for grouping or filtering: use `TrackerMath.npcKey(tracker)` (uuid, or `name:<text>` for manual NPCs). Manual names are never orphans (`findOrphans` skips them) and never go through the bridge.
+The NPC side may also be a CB **organization** (topic `Organization`, fallback 3): `CampaignBuilderBridge.npcs()` lists
+characters and organizations (`EntryRef.organization`), `isOrganization(entry)` tells them apart. Same rules as NPCs;
+the UI marks them "(Organization)" / icon. Field names stay `npc*`.
 
 ## Layout
 
@@ -141,13 +144,13 @@ Re-check with every CB release (repo `dovrosenberg/fvtt-campaign-builder`):
   `TOPICS` (with fallbacks); `getEntries(topic)` is deliberately not used (current setting only).
 - `src/documents/indices.ts` (`entryIndexFields`, `TYPE_FIELD`) and `src/documents/types.ts`
   (`DOCUMENT_TYPES.Entry` = `campaign-builder.entry2`): how entries are recognized in the packs.
-- `src/types/index.ts`: `Topics` enum (`Character = 1`, `PC = 4`); live values come from `api.TOPICS`.
+- `src/types/index.ts`: `Topics` enum (`Character = 1`, `Organization = 3`, `PC = 4`); live values come from `api.TOPICS`.
 - `src/documents/entry.ts`: page subtype `entry2`; we read only `system.topic`, `system.playerName`.
 - `src/classes/Documents/FCBSetting.ts` (`createCompendium`): each CB setting is a world compendium
   labelled `FCB - <name>` (GM `OWNER`, others `LIMITED`). The label prefix is how we find the packs;
   if the CB ever changes it, `UPSTREAM.PACK_LABEL_PREFIX` is the one place to adapt.
 - World setting `campaign-builder.customFields`: custom field definitions per `CustomFieldContentType`
-  (`Character = 1`), each `{name, label, fieldType, sortOrder, deleted}`; `FieldType.Editor = 2`. Values live in
+  (`Character = 1`, `Organization = 3`; enum in `src/types/customFields.ts`), each `{name, label, fieldType, sortOrder, deleted}`; `FieldType.Editor = 2`. Values live in
   the entry page's `system.customFields[name]` (HTML for editor fields). Constants in `UPSTREAM`.
 - CB window: `src/applications/CampaignBuilder.ts` (id `app-fcb-CampaignBuilder`); extension
   there would be DOM injection into a Vue app (phase 2, optional, fragile).
@@ -188,7 +191,8 @@ Re-check with every CB release (repo `dovrosenberg/fvtt-campaign-builder`):
   module; agreed with the maintainer). Only editor fields (formatting) of characters, not deleted, are offered.
   The setting is a plain `String` with a choices object refilled in place (`ModuleSettings.refreshExportFieldChoices`,
   on `ready` and on `updateSetting` of the CB's `customFields`), so a deleted field stays stored and the export can
-  report it. The world setting `exportOrder` (`EXPORT_ORDERS`: `oldestFirst` default, `newestFirst`) sets the
+  report it. Organizations export into the field of the separate setting `exportFieldOrganization` (CB custom fields
+  are per content type, `CustomFieldContentType.Organization = 3`). The world setting `exportOrder` (`EXPORT_ORDERS`: `oldestFirst` default, `newestFirst`) sets the
   order of the log entries (pure `HistoryHtml.order`; the stored log stays oldest first). Errors (no field, field missing, manual NPC, entry missing) are thrown as localized `Error`s. This is the
   only place where we write to a CB document, and only `system.customFields.<name>`; the CB's search index catches up
   on its own next rebuild/save.

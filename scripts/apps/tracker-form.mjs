@@ -124,7 +124,11 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
       this.#restored = true;
     }
     const empty = !isEdit && npcChoices.length === 0;
-    const npcLabel = isEdit && d.npcUuid ? ((await CampaignBuilderBridge.resolve(d.npcUuid))?.name ?? "") : "";
+    let npcLabel = "";
+    if (isEdit && d.npcUuid) {
+      const entry = await CampaignBuilderBridge.resolve(d.npcUuid);
+      npcLabel = entry ? TrackerForm.#label(entry.name, CampaignBuilderBridge.isOrganization(entry)) : "";
+    }
 
     return Object.assign(context, {
       isEdit,
@@ -152,16 +156,28 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   /**
-   * Select options for entries, sorted by name. When entries of several Campaign Builder settings
-   * are listed, each label carries its setting name.
+   * Select options for entries, sorted by name. Organizations are marked as such; when entries of
+   * several Campaign Builder settings are listed, each label also carries its setting name.
    * @param {import("../integration/campaign-builder-bridge.mjs").EntryRef[]} entries
    * @returns {{value: string, label: string}[]}
    */
   static #choices(entries) {
     const severalSettings = new Set(entries.map(e => e.setting)).size > 1;
     return entries
-      .map(e => ({ value: e.uuid, label: severalSettings ? `${e.name} (${e.setting})` : e.name }))
+      .map(e => ({ value: e.uuid, label: TrackerForm.#label(e.name, e.organization, severalSettings ? e.setting : "") }))
       .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang));
+  }
+
+  /**
+   * Display label of an entry: its name, followed by "(Organization, setting)" as far as applicable.
+   * @param {string} name
+   * @param {boolean} organization
+   * @param {string} [setting]
+   * @returns {string}
+   */
+  static #label(name, organization, setting = "") {
+    const tags = [organization ? game.i18n.localize(`${I18N_PREFIX}.Form.organization`) : "", setting].filter(Boolean);
+    return tags.length ? `${name} (${tags.join(", ")})` : name;
   }
 
   /**
