@@ -25,6 +25,8 @@
       "new": "New tracker",
       "filter": "Filter by NPC",
       "filterAll": "All NPCs",
+      "filterPc": "Filter by PC",
+      "filterPcAll": "All PCs",
       "empty": "No active trackers. Create one with “New tracker”.",
       "aside": "Set aside ({count})",
       "removed": "Tracker removed: {name}",

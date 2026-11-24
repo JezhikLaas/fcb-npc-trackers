@@ -18,7 +18,7 @@ Requirements (agreed with the maintainer):
 - Remove a tracker with one click (no confirmation, short undo).
 - Trackers persist until removed, so they can be prepared before a session.
 - Scope: one tracker per NPC × PC pair. GM only.
-- UI: a session panel with all active trackers (filterable per NPC).
+- UI: a session panel with all active trackers (filterable per NPC and per PC).
 
 ## Core architecture decisions
 
@@ -79,7 +79,7 @@ Requirements (agreed with the maintainer):
 
 ## NPC / PC identity
 
-An NPC or PC is a CB entry (`npcUuid`/`pcUuid`) or a manual name (`npcName`/`pcName`); a uuid always wins and clears the name. Never compare `npcUuid` directly for grouping or filtering: use `TrackerMath.npcKey(tracker)` (uuid, or `name:<text>` for manual NPCs). Manual names are never orphans (`findOrphans` skips them) and never go through the bridge.
+An NPC or PC is a CB entry (`npcUuid`/`pcUuid`) or a manual name (`npcName`/`pcName`); a uuid always wins and clears the name. Never compare `npcUuid`/`pcUuid` directly for grouping or filtering: use `TrackerMath.npcKey(tracker)` / `TrackerMath.pcKey(tracker)` (uuid, or `name:<text>` for manual names). The panel has an NPC and a PC filter side by side (combined with AND). Manual names are never orphans (`findOrphans` skips them) and never go through the bridge.
 The NPC side may also be a CB **organization** (topic `Organization`, fallback 3): `CampaignBuilderBridge.npcs()` lists
 characters and organizations (`EntryRef.organization`), `isOrganization(entry)` tells them apart. Same rules as NPCs;
 the UI marks them "(Organization)" / icon. Field names stay `npc*`.

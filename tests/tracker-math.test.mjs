@@ -172,6 +172,19 @@ describe("TrackerMath.npcKey", () => {
   });
 });
 
+describe("TrackerMath.pcKey", () => {
+  it("prefers the CB uuid", () => {
+    assert.equal(TrackerMath.pcKey({ pcUuid: "p1", pcName: "Ignored" }), "p1");
+  });
+  it("uses the prefixed manual name when there is no uuid", () => {
+    assert.equal(TrackerMath.pcKey({ pcUuid: null, pcName: " Arno Pearl " }), "name:Arno Pearl");
+  });
+  it("is empty without uuid and name", () => {
+    assert.equal(TrackerMath.pcKey({ pcUuid: null, pcName: "" }), "");
+    assert.equal(TrackerMath.pcKey({}), "");
+  });
+});
+
 describe("TrackerMath.normalize (manual names)", () => {
   it("trims manual names and cuts them to the maximum length", () => {
     const result = TrackerMath.normalize({

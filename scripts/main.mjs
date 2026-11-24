@@ -27,7 +27,7 @@ class TrackerApi {
 
   /**
    * Open the tracker panel (GM only).
-   * @param {{npcUuid?: string}} [options]  Filter the list to one NPC.
+   * @param {{npcUuid?: string, pcUuid?: string}} [options]  Filter the list to one NPC and/or PC.
    * @returns {TrackerPanel|null}
    */
   openPanel(options) {
@@ -36,7 +36,7 @@ class TrackerApi {
 
   /**
    * Open the dialog for a new tracker (GM only).
-   * @param {{npcUuid?: string}} [options]  Preselected NPC.
+   * @param {{npcUuid?: string, pcUuid?: string}} [options]  Preselected NPC / PC.
    * @returns {Promise<TrackerForm>}
    */
   openCreateDialog(options) {

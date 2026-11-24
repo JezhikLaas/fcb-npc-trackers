@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0 – 2026-11-24
+
+- **Filter by player character**: the panel has a second filter next to the NPC filter that limits the list to one player character; both filters combine. "New tracker" preselects the filtered NPC and PC. API: `openPanel({ pcUuid })`, `openCreateDialog({ pcUuid })`.
+
 ## 0.5.0 – 2026-11-17
 
 - **Organizations as NPCs**: Campaign Builder organizations can be chosen on the NPC side of a tracker. They are marked "(Organization)" in the create dialog and the panel filter and show an icon on the card. The history transfer works the same; since the Campaign Builder keeps custom fields of organizations apart from those of characters, a new world setting "Field for the history (organizations)" chooses the target field.

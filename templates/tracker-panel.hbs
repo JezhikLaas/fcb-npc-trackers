@@ -1,7 +1,10 @@
 <div class="fcb-npc-trackers-panel__root">
 <header class="fcb-npc-trackers-panel__header">
   <select name="filterNpc" aria-label="{{localize 'FCB_NPC_TRACKERS.Panel.filter'}}">
-    {{selectOptions npcChoices selected=filter valueAttr="value" labelAttr="label" blank=allLabel}}
+    {{selectOptions npcChoices selected=filterNpc valueAttr="value" labelAttr="label" blank=allNpcLabel}}
+  </select>
+  <select name="filterPc" aria-label="{{localize 'FCB_NPC_TRACKERS.Panel.filterPc'}}">
+    {{selectOptions pcChoices selected=filterPc valueAttr="value" labelAttr="label" blank=allPcLabel}}
   </select>
   <button type="button" data-action="addTracker">
     <i class="fa-solid fa-plus" inert></i> {{localize "FCB_NPC_TRACKERS.Panel.new"}}

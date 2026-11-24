@@ -132,6 +132,18 @@ export class TrackerMath {
   }
 
   /**
+   * Grouping key of a tracker's PC: the CB uuid, or `name:<text>` for a manual PC, or "" when
+   * neither is set. Used by the panel filter.
+   * @param {Pick<Tracker, "pcUuid"|"pcName">} tracker
+   * @returns {string}
+   */
+  static pcKey(tracker) {
+    if (tracker.pcUuid) return tracker.pcUuid;
+    const name = String(tracker.pcName ?? "").trim();
+    return name ? `${TrackerMath.NAME_KEY_PREFIX}${name}` : "";
+  }
+
+  /**
    * Move an item before or after another one (by `id`). Used for reordering trackers.
    * @template {{id: string}} T
    * @param {T[]} items

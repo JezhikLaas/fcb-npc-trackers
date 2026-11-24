@@ -22,8 +22,11 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
   /** The panel instance, kept between openings. @type {TrackerPanel|null} */
   static #instance = null;
 
-  /** UUID of the NPC the list is filtered to; empty shows all. */
+  /** Key of the NPC the list is filtered to (see TrackerMath.npcKey); empty shows all. */
   #filterNpc = "";
+
+  /** Key of the PC the list is filtered to (see TrackerMath.pcKey); empty shows all. */
+  #filterPc = "";
 
   /**
    * Campaign Builder entries by UUID; null marks an entry that no longer exists.
@@ -78,14 +81,16 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
   };
 
   /**
-   * Open the panel (GM only), optionally filtered to one NPC.
-   * @param {{npcUuid?: string}} [options]  `npcUuid` filters the list; an empty string clears the filter.
+   * Open the panel (GM only), optionally filtered to one NPC and/or PC.
+   * @param {{npcUuid?: string, pcUuid?: string}} [options]  Filter the list by NPC / PC (uuid or `name:<text>`
+   *   key); an empty string clears that filter, omitting it keeps the current one.
    * @returns {TrackerPanel|null}
    */
-  static open({ npcUuid } = {}) {
+  static open({ npcUuid, pcUuid } = {}) {
     if (!game.user.isGM) return null;
     const panel = (TrackerPanel.#instance ??= new TrackerPanel());
     if (npcUuid !== undefined) panel.#filterNpc = npcUuid;
+    if (pcUuid !== undefined) panel.#filterPc = pcUuid;
     panel.render({ force: true });
     return panel;
   }
@@ -105,19 +110,23 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
     const all = TrackerStore.list();
     await this.#resolveNames(all);
 
-    const npcKeys = new Set(all.map(t => TrackerMath.npcKey(t)).filter(Boolean));
-    if (this.#filterNpc) npcKeys.add(this.#filterNpc);
-    const npcChoices = [...npcKeys]
-      .map(key => ({ value: key, label: this.#keyLabel(key) }))
-      .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang));
+    const npcChoices = this.#choices(all, TrackerMath.npcKey, this.#filterNpc, "missingNpc");
+    const pcChoices = this.#choices(all, TrackerMath.pcKey, this.#filterPc, "missingPc");
 
-    const visible = all.filter(t => !this.#filterNpc || TrackerMath.npcKey(t) === this.#filterNpc);
+    const visible = all.filter(
+      t =>
+        (!this.#filterNpc || TrackerMath.npcKey(t) === this.#filterNpc) &&
+        (!this.#filterPc || TrackerMath.pcKey(t) === this.#filterPc)
+    );
     const collapsed = ModuleSettings.collapsed;
     const card = t => ({ ...this.#card(t), collapsed: collapsed.has(t.id) });
     return Object.assign(context, {
       npcChoices,
-      filter: this.#filterNpc,
-      allLabel: game.i18n.localize(`${I18N_PREFIX}.Panel.filterAll`),
+      pcChoices,
+      filterNpc: this.#filterNpc,
+      filterPc: this.#filterPc,
+      allNpcLabel: game.i18n.localize(`${I18N_PREFIX}.Panel.filterAll`),
+      allPcLabel: game.i18n.localize(`${I18N_PREFIX}.Panel.filterPcAll`),
       cards: visible.filter(t => t.active).map(card),
       aside: visible.filter(t => !t.active).map(card),
       asideOpen: this.#asideOpen,
@@ -227,13 +236,33 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   /**
-   * Handle the NPC filter and note inputs (delegated: the content is re-rendered often).
+   * Options of a filter select: every key of the trackers (plus the current filter, so it stays
+   * selectable after its last tracker is gone), sorted by label.
+   * @param {import("../tracker/tracker-math.mjs").Tracker[]} trackers
+   * @param {(tracker: object) => string} keyOf      TrackerMath.npcKey or TrackerMath.pcKey.
+   * @param {string} current                         Current filter key ("" for none).
+   * @param {"missingNpc"|"missingPc"} missingKey    i18n key shown for a deleted CB entry.
+   * @returns {{value: string, label: string}[]}
+   */
+  #choices(trackers, keyOf, current, missingKey) {
+    const keys = new Set(trackers.map(keyOf).filter(Boolean));
+    if (current) keys.add(current);
+    return [...keys]
+      .map(key => ({ value: key, label: this.#keyLabel(key, missingKey) }))
+      .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang));
+  }
+
+  /**
+   * Handle the NPC/PC filters and note inputs (delegated: the content is re-rendered often).
    * @param {Event} event
    */
   #onChange(event) {
     const target = event.target;
     if (target.name === "filterNpc") {
       this.#filterNpc = target.value;
+      this.render();
+    } else if (target.name === "filterPc") {
+      this.#filterPc = target.value;
       this.render();
     } else if (target.matches?.("input[data-note]")) {
       const { trackerId, logId } = target.dataset;
@@ -247,7 +276,9 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   async #resolveNames(trackers) {
     const wanted = new Set(trackers.flatMap(t => [t.npcUuid, t.pcUuid]).filter(Boolean));
-    if (this.#filterNpc && !this.#filterNpc.startsWith(TrackerMath.NAME_KEY_PREFIX)) wanted.add(this.#filterNpc);
+    for (const key of [this.#filterNpc, this.#filterPc]) {
+      if (key && !key.startsWith(TrackerMath.NAME_KEY_PREFIX)) wanted.add(key);
+    }
     await Promise.all(
       [...wanted]
         .filter(uuid => !this.#names.has(uuid))
@@ -268,14 +299,15 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   /**
-   * Label of a filter key (see TrackerMath.npcKey): a manual name or the name of a CB entry.
+   * Label of a filter key (see TrackerMath.npcKey/pcKey): a manual name or the name of a CB entry.
    * @param {string} key
+   * @param {"missingNpc"|"missingPc"} missingKey  i18n key shown when the page no longer exists.
    * @returns {string}
    */
-  #keyLabel(key) {
+  #keyLabel(key, missingKey) {
     const prefix = TrackerMath.NAME_KEY_PREFIX;
     if (key.startsWith(prefix)) return key.slice(prefix.length);
-    const name = this.#displayName(key, "missingNpc");
+    const name = this.#displayName(key, missingKey);
     return this.#names.get(key)?.organization
       ? `${name} (${game.i18n.localize(`${I18N_PREFIX}.Form.organization`)})`
       : name;
@@ -453,7 +485,7 @@ export class TrackerPanel extends HandlebarsApplicationMixin(ApplicationV2) {
 
   /** @this {TrackerPanel} */
   static #onAddTracker() {
-    return TrackerForm.open({ npcUuid: this.#filterNpc || undefined });
+    return TrackerForm.open({ npcUuid: this.#filterNpc || undefined, pcUuid: this.#filterPc || undefined });
   }
 
   /**

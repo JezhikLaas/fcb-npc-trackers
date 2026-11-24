@@ -51,12 +51,13 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
    * @param {object} [data]
    * @param {string|null} [data.trackerId]  Edit this tracker instead of creating one.
    * @param {string} [data.npcUuid]         Preselected NPC (create only): a CB uuid or a `name:<text>` filter key.
+   * @param {string} [data.pcUuid]          Preselected PC (create only): a CB uuid or a `name:<text>` filter key.
    * @param {object} [options]              ApplicationV2 options.
    */
-  constructor({ trackerId = null, npcUuid } = {}, options = {}) {
+  constructor({ trackerId = null, npcUuid, pcUuid } = {}, options = {}) {
     super(options);
     this.#trackerId = trackerId;
-    this.#draft = trackerId ? TrackerForm.#draftFromTracker(trackerId) : TrackerForm.#draftForCreate(npcUuid);
+    this.#draft = trackerId ? TrackerForm.#draftFromTracker(trackerId) : TrackerForm.#draftForCreate(npcUuid, pcUuid);
   }
 
   /** @override */
@@ -90,7 +91,7 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
 
   /**
    * Open the form (closing a previous one).
-   * @param {{trackerId?: string|null, npcUuid?: string}} [data]
+   * @param {{trackerId?: string|null, npcUuid?: string, pcUuid?: string}} [data]
    * @returns {Promise<TrackerForm>}
    */
   static async open(data = {}) {
@@ -333,20 +334,22 @@ export class TrackerForm extends HandlebarsApplicationMixin(ApplicationV2) {
 
   /**
    * Draft for a new tracker. The remembered NPC/PC are applied later (`#restoreLast`), once the lists are known.
-   * @param {string} [npcUuid]  Preselected NPC.
+   * @param {string} [npcUuid]  Preselected NPC (uuid or `name:<text>` key).
+   * @param {string} [pcUuid]   Preselected PC (uuid or `name:<text>` key).
    * @returns {Draft}
    */
-  static #draftForCreate(npcUuid) {
+  static #draftForCreate(npcUuid, pcUuid) {
     const prefix = TrackerMath.NAME_KEY_PREFIX;
     const manual = npcUuid?.startsWith(prefix) ? npcUuid.slice(prefix.length) : "";
+    const manualPc = pcUuid?.startsWith(prefix) ? pcUuid.slice(prefix.length) : "";
     const last = ModuleSettings.lastCreate;
     const templateId = TrackerTemplates.find(TrackerStore.templates, last.templateId) ? last.templateId : DEFAULT_TEMPLATE_ID;
     return {
       name: "",
       npcUuid: manual ? "" : npcUuid || "",
       npcName: manual,
-      pcUuid: "",
-      pcName: "",
+      pcUuid: manualPc ? "" : pcUuid || "",
+      pcName: manualPc,
       templateId,
       bars: TrackerForm.#barsFromTemplateId(templateId)
     };

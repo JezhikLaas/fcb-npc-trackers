@@ -25,6 +25,8 @@
       "new": "Neuer Tracker",
       "filter": "Nach NSC filtern",
       "filterAll": "Alle NSCs",
+      "filterPc": "Nach SC filtern",
+      "filterPcAll": "Alle SCs",
       "empty": "Keine aktiven Tracker. Lege einen mit „Neuer Tracker“ an.",
       "aside": "Zurückgestellt ({count})",
       "removed": "Tracker entfernt: {name}",

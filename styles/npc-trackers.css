@@ -31,7 +31,8 @@
 }
 
 .fcb-npc-trackers-panel__header select {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .fcb-npc-trackers-panel__header button {
